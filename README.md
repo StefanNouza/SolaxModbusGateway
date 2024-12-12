@@ -6,7 +6,14 @@
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/tobiasfaust/SolaxModbusGateway?include_prereleases&style=plastic)
 ![GitHub All Releases](https://img.shields.io/github/downloads/tobiasfaust/SolaxModbusGateway/total?style=plastic)
 
-
+<aside>
+ <form action="https://www.paypal.com/donate" method="post" target="_top">
+ <input type="hidden" name="hosted_button_id" value="RYUQVSNNTP3N6" />
+ <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+ <img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1" />
+ </form>
+</aside>
+  
 This project implements a Gateway for Solar Inverters with Modbus-RTU communication to MQTT on ESP32 basis.  
 Direkt Communication with [OpenWB](https://openwb.de) is implemented.
 Sending "set" commands to inverter are basically implemented too.
