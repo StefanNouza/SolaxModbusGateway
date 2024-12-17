@@ -48,10 +48,7 @@ jobs:
             subvariant: standard
           - firmware: firmware_ESP32-WebSerial
             architecture: ESP32
-            subvariant: webSerial
-          - firmware: firmware_ESP8266
-            architecture: ESP8266
-            subvariant: standard  
+            subvariant: webSerial 
             
     steps:
       - name: checkout repository
