@@ -2,7 +2,7 @@ import argparse, os
 from pathlib import Path
 from myUtils import *
 
-parser = argparse.ArgumentParser() 
+parser = argparse.ArgumentParser()
 
 # erwartete Parameter
 parser.add_argument('--FwDir', type=str, help='Root Verzeichnis für alle Firmwares', default='web-installer/firmware')
@@ -16,10 +16,14 @@ if Path(args.VersDir).is_dir() and Path(args.FwDir).is_dir():
     renameDirs(args.VersDir)
 
     # Suche nach 'manifest.json'-Dateien und extrahiere daraus die Daten für 
-    # das 'manifest_all.json' aller ESP Architekturen im Hauptverzeichnis der Version
-    process_manifests(args.VersDir)
+    # das 'manifestAll.json' aller ESP Architekturen im Hauptverzeichnis der Version
+    process_manifestAll(args.VersDir)
 
-    # Suche nach 'manifest.json'-Dateien und extrahiere daraus die Daten für die 'versions.json'
+    # Suche nach 'manifest.json'-Dateien und extrahiere daraus die Daten für
+    # das 'filesAll.json' aller ESP Architekturen und Varianten im Hauptverzeichnis der Version
+    process_filesAll(args.VersDir)
+
+    # Suche nach 'manifestAll.json'-Dateien und extrahiere daraus die Daten für die 'versions.json'
     extracted_data = search_manifests_and_extract_version(args.FwDir, False)
 
     # Lösche die ältesten Versionen
