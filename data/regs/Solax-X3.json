@@ -21,12 +21,14 @@
                 ]
             ],
             "RequestIdData": [
-                "#ClientID",
-                "0x03",
-                "0x00",
-                "0x00",
-                "0x00",
-                "0x14"
+                [
+                    "#ClientID",
+                    "0x03",
+                    "0x00",
+                    "0x00",
+                    "0x00",
+                    "0x14"
+                ]
             ],
             "ClientIdPos": 0,
             "LiveDataFunctionCodePos": 1,
@@ -893,12 +895,14 @@
                 ]
             ],
             "RequestIdData": [
-                "#ClientID",
-                "0x03",
-                "0x03",
-                "0x00",
-                "0x00",
-                "0x54"
+                [
+                    "#ClientID",
+                    "0x03",
+                    "0x03",
+                    "0x00",
+                    "0x00",
+                    "0x54"
+                ]
             ],
             "ClientIdPos": 0,
             "LiveDataFunctionCodePos": 1,

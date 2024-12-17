@@ -6,6 +6,13 @@
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/tobiasfaust/SolaxModbusGateway?include_prereleases&style=plastic)
 ![GitHub All Releases](https://img.shields.io/github/downloads/tobiasfaust/SolaxModbusGateway/total?style=plastic)
 
+-----
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate?hosted_button_id=RYUQVSNNTP3N6)
+
+If you think the project is great, I would be happy about a donation to be able to integrate paid extensions.
+I want to integrate the professional WebSerial and professional ElegantOTA Edition but each of them costs 250€.
+
+-----
 
 This project implements a Gateway for Solar Inverters with Modbus-RTU communication to MQTT on ESP32 basis.  
 Direkt Communication with [OpenWB](https://openwb.de) is implemented.
@@ -44,5 +51,6 @@ request: 01 03 00 00 00 07 08 04
 Response: 01 03 .....
 </pre>
 
+Burn firmware on your device via web-installer: https://tobiasfaust.github.io/SolaxModbusGateway/
 
 ## please refer full documentation and How-To´s in our [Wiki](https://github.com/tobiasfaust/SolaxModbusGateway/wiki)
