@@ -19,7 +19,6 @@ on:
       - '**.py'
 
 jobs:
-    
   build:
     name: BuildAndDeploy-${{ matrix.variant.firmware }}
     runs-on: ubuntu-latest
