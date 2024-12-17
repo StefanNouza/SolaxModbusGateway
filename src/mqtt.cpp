@@ -61,7 +61,7 @@ MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint1
 
   } else {
     // use Wifi
-    improvSerial.ConnectToWifi(true);
+    improvSerial.ConnectToWifi();
   }
 
   if (Config->GetDebugLevel() >=4) WiFi.printDiag(dbg);
