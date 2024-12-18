@@ -70,7 +70,7 @@ jobs:
         run: |
           platformio run -e ${{ matrix.variant.firmware }}
           if [ -d "data" ]; then
-            platformio run --target buildfs -e ${{ matrix.variant.firmware }} --build-flag="-DGITHUB_RUN=\"${{ env.GITHUB_RUN }}\""
+            platformio run --target buildfs -e ${{ matrix.variant.firmware }}
           fi
           python .github/scripts/createMergedFirmware.py \
             --ChipFamily ${{ matrix.variant.architecture }} \
