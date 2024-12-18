@@ -1,15 +1,28 @@
+Release 3.3.0:
+  - new feature: WebSerial as remote serial output (#74)
+  - new feature: configurable serial output pins
+  - replace deprecated arduinojson library function "containsKey"
+  - improvement: use serveStatic function with cache-control instead of custom handling
+  - new feature: Authorization/authentication on the web (#80)
+  - new feature: defining multiple requests for id-data (thanks to @Lazgar) (#89)
+  - new feature: add web-installer
+  - new feature: use ImprovWiFi, remove ESPWifiManager
+  - add donation button for paid extensions
+  - replace customOTA to custom ElegantOTA
+  - move config files from root to subfolder /config
+
 Release 3.2.2:
-  - add GoodWe Support, by TigerGrey (#58)
-  - add support for id and livedate on same functioncode, by TigerGrey (#58)
-  - add CRC Check to validate response (#43), enabling in Modbusconfig
-  - add data length check to validate response (#43), enabling in Modbusconfig
-  - add reading of potential-free Relays on Inverter (#67), enabling in Modbusconfig
+  - new feature: GoodWe Support, by @TigerGrey (#58)
+  - new feature: support for id and livedate on same functioncode, by @TigerGrey (#58)
+  - new feature: CRC Check to validate response (#43), enabling in Modbusconfig
+  - new feature: data length check to validate response (#43), enabling in Modbusconfig
+  - new feature: reading of potential-free Relays on Inverter (#67), enabling in Modbusconfig, thanks to @Lazgar
   
 Release 3.2.1:
   - add modbusprotocoll doc for Solax-X1/X3 G4 (incl. write register) (thanks to @lattemacchiato) (#64)
   - fix bug in solax-x1.json at EnergyTotalToGrid
-  - add Solax-Mic-Pro configuration, thanks to michacee (#35)
-  - add support for Growatt-MOD_4000_TL3-XH, thanks to Gustavw82 (#70).
+  - add Solax-Mic-Pro configuration, thanks to @michacee (#35)
+  - add support for Growatt-MOD_4000_TL3-XH, thanks to @Gustavw82 (#70).
   - add page loading visualization
   
 Release 3.2.0:

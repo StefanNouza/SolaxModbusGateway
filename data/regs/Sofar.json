@@ -5,7 +5,9 @@
       "RequestLiveData": [
         ["#ClientID", "0x03", "0x00", "0x00", "0x00", "0x30"]
       ],
-      "RequestIdData": ["#ClientID", "0x04", "0x20", "0x00", "0x00", "0x0B"],
+      "RequestIdData": [
+        ["#ClientID", "0x04", "0x20", "0x00", "0x00", "0x0B"]
+      ],
       "ClientIdPos": 0,
       "LiveDataFunctionCodePos": 1,
       "LiveDataFunctionCode": "0x03",

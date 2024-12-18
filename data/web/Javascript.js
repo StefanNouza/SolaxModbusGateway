@@ -6,7 +6,9 @@
 
 const gpio_disabled = [];
 
-const gpio = [  {port: 2 , name:'D2'},
+const gpio = [  {port: 1,  name:'D1/TX0'},
+                {port: 2 , name:'D2'},
+                {port: 3,  name:'D3/RX0'},
                 {port: 4 , name:'D4'},
                 {port: 5 , name:'D5'},
                 {port: 6 , name:'D6'},
@@ -350,7 +352,7 @@ function onSubmit(DataForm, separator='') {
   var textToSaveAsBlob = new Blob([JSON.stringify(JsonData)], {type:"text/plain"});
   
   const formData = new FormData();
-  formData.append(filename + ".json", textToSaveAsBlob, '/' + filename + ".json");
+  formData.append(filename + ".json", textToSaveAsBlob, '/config/' + filename + ".json");
     
     fetch('/doUpload', {
       method: 'POST',

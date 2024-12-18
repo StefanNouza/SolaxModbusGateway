@@ -3,9 +3,9 @@
 <head>
   <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
   <meta charset='utf-8'>
-  <link rel='stylesheet' type='text/css' href='/web/Style.css'>
-  <script language='javascript' type='text/javascript' src='/web/Javascript.js'></script>
-  <script language='javascript' type='text/javascript' src='/web/navi.js'></script>
+  <link rel='stylesheet' type='text/css' href='Style.css'>
+  <script language='javascript' type='text/javascript' src='Javascript.js'></script>
+  <script language='javascript' type='text/javascript' src='navi.js'></script>
   <title>Modbus MQTT Gateway</title>
 </head>
 <body>
@@ -15,7 +15,7 @@
         <h2>Configuration</h2>
       </td>
 
-      <td colspan='4' style='color:#CCCCCC;'>
+      <td colspan='6' style='color:#CCCCCC;'>
         <i>(<span id='hostname'></span>)</i>
       </td>
       <td colspan='7'>
@@ -33,7 +33,7 @@
       <td class='navi' style='width: 50px'></td>
       <td class='navi' name='navi' id='baseconfig' onclick='highlightNavi(this)' style='width: 100px'><a href='/web/baseconfig.html' target="frame_main">Basis Config</a></td>
       <td class='navi' style='width: 50px'></td>
-      <td class='navi' name='navi' id='ModbusConfig' onclick='highlightNavi(this)' style='width: 100px'><a href='/web/modbusconfig.html' target="frame_main">Modbus Config</a></td>
+      <td class='navi' name='navi' id='ModbusConfig' onclick='highlightNavi(this)' style='width: 120px'><a href='/web/modbusconfig.html' target="frame_main">Modbus Config</a></td>
       <td class='navi' style='width: 50px'></td>
       <td class='navi' name='navi' id='ModbusItemConfig' onclick='highlightNavi(this)' style='width: 100px'><a href='/web/modbusitemconfig.html' target="frame_main">Item Config</a></td>
       <td class='navi' style='width: 50px'></td>
@@ -42,6 +42,13 @@
       <td class='navi' name='navi' id='handleFiles' onclick='highlightNavi(this)' style='width: 100px'><a href='/web/handlefiles.html' target="frame_main">Files</a></td>
       <td class='navi' style='width: 50px'></td>
       <td class='navi' name='navi' id='wiki' style='width: 100px'><a href='https://github.com/tobiasfaust/SolaxModbusGateway/wiki' target='_blank'>Wiki</a></td>
+      <td class='navi' style='width: 50px'></td>
+      <td class='navi'>
+        <form style='margin: -5px' action="https://www.paypal.com/donate" method="post" target="_blank">
+          <input type="hidden" name="hosted_button_id" value="RYUQVSNNTP3N6" />
+          <input type="image" style='margin: -5px; padding: 0px; border: 0px;' src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" name="submit" title="If you think the project is great, I would be happy about a donation to be able to integrate paid extensions. I want to integrate the professional WebSerial and professional ElegantOTA Edition but each of them costs 250€." alt="please by me a coffee" />
+          </form>
+      </td>
       <td class='navi' style='width: 50px'></td>
     </tr>
   </table>

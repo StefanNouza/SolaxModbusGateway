@@ -19,7 +19,8 @@
 #include "handleFiles.h"
 #include "mqtt.h"
 #include "favicon.h"
-#include "html_update.h"
+//#include "html_update.h"
+#include <ElegantOTA.h>
 #include "_Release.h"
 
 class MyWebServer {
@@ -41,14 +42,13 @@ class MyWebServer {
 
     handleFiles* fsfiles;
 
-    void      handle_update_page(AsyncWebServerRequest *request);
-    void      handle_update_progress(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);    
-    void      handle_update_response(AsyncWebServerRequest *request);
+//    void      handle_update_page(AsyncWebServerRequest *request);
+//    void      handle_update_progress(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final);    
+//    void      handle_update_response(AsyncWebServerRequest *request);
     void      handleNotFound(AsyncWebServerRequest *request);
     void      handleReboot(AsyncWebServerRequest *request);
     void      handleReset(AsyncWebServerRequest *request);
     void      handleWiFiReset(AsyncWebServerRequest *request);
-    void      handleRequestFiles(AsyncWebServerRequest *request);
     void      handleRoot(AsyncWebServerRequest *request);
     void      handleFavIcon(AsyncWebServerRequest *request);
     void      handleAjax(AsyncWebServerRequest *request);
@@ -57,6 +57,8 @@ class MyWebServer {
     void      GetInitDataStatus(AsyncResponseStream *response);
     void      GetInitDataNavi(AsyncResponseStream *response);
     
+    void      onImprovWiFiConnectedCb(const char *ssid, const char *password);
+    void      onOTAEnd(bool success);
 };
 
 #endif

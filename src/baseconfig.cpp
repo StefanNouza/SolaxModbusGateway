@@ -1,11 +1,15 @@
 #include "baseconfig.h"
 
-BaseConfig::BaseConfig() : debuglevel(0) {  
+BaseConfig::BaseConfig() : debuglevel(0), serial_rx(3), serial_tx(1), useAuth(false) {  
   #ifdef ESP8266
     LittleFS.begin();
   #elif ESP32
-    if (!LittleFS.begin(true)) { // true: format LittleFS/NVS if mount fails
-      Serial.println("LittleFS Mount Failed");
+    if (LittleFS.begin(true)) { // true: format LittleFS/NVS if mount fails
+      if (!LittleFS.exists("/config")) {
+        LittleFS.mkdir("/config");
+      }
+    } else {
+      dbg.println("LittleFS Mount Failed");
     }
   #endif
   
@@ -18,36 +22,42 @@ BaseConfig::BaseConfig() : debuglevel(0) {
 
 void BaseConfig::LoadJsonConfig() {
   bool loadDefaultConfig = false;
-  if (LittleFS.exists("/baseconfig.json")) {
+  if (LittleFS.exists("/config/baseconfig.json")) {
     //file exists, reading and loading
-    Serial.println("reading config file");
-    File configFile = LittleFS.open("/baseconfig.json", "r");
+    dbg.println("reading config file");
+    File configFile = LittleFS.open("/config/baseconfig.json", "r");
     if (configFile) {
-      Serial.println("opened config file");
+      dbg.println("opened config file");
       
       JsonDocument doc;
       DeserializationError error = deserializeJson(doc, configFile);
       
-      if (!error && doc.containsKey("data")) {
-        serializeJsonPretty(doc, Serial);
+      if (!error && doc["data"]) {
+        serializeJsonPretty(doc, dbg);
         
-        if (doc["data"].containsKey("mqttroot"))         { this->mqtt_root = doc["data"]["mqttroot"].as<String>();} else {this->mqtt_root = "solax";}
-        if (doc["data"].containsKey("mqttserver"))       { this->mqtt_server = doc["data"]["mqttserver"].as<String>();} else {this->mqtt_server = "test.mosquitto.org";}
-        if (doc["data"].containsKey("mqttport"))         { this->mqtt_port = (int)(doc["data"]["mqttport"]);} else {this->mqtt_port = 1883;}
-        if (doc["data"].containsKey("mqttuser"))         { this->mqtt_username = doc["data"]["mqttuser"].as<String>();} else {this->mqtt_username = "";}
-        if (doc["data"].containsKey("mqttpass"))         { this->mqtt_password = doc["data"]["mqttpass"].as<String>();} else {this->mqtt_password = "";}
-        if (doc["data"].containsKey("mqttbasepath"))     { this->mqtt_basepath = doc["data"]["mqttbasepath"].as<String>();} else {this->mqtt_basepath = "home/";}
-        if (doc["data"].containsKey("UseRandomClientID")){ if (strcmp(doc["data"]["UseRandomClientID"], "none")==0) { this->mqtt_UseRandomClientID=false;} else {this->mqtt_UseRandomClientID=true;}} else {this->mqtt_UseRandomClientID = true;}
-        if (doc["data"].containsKey("SelectConnectivity")){if (strcmp(doc["data"]["SelectConnectivity"], "wifi")==0) { this->useETH=false;} else {this->useETH=true;}} else {this->useETH = false;}
-        if (doc["data"].containsKey("debuglevel"))       { this->debuglevel = _max((int)(doc["data"]["debuglevel"]), 0);} else {this->debuglevel = 0; }
-        if (doc["data"].containsKey("SelectLAN"))        {this->LANBoard = doc["data"]["SelectLAN"].as<String>();} else {this->LANBoard = "";}
+        if (doc["data"]["mqttroot"])         { this->mqtt_root = doc["data"]["mqttroot"].as<String>();} else {this->mqtt_root = "solax";}
+        if (doc["data"]["mqttserver"])       { this->mqtt_server = doc["data"]["mqttserver"].as<String>();} else {this->mqtt_server = "test.mosquitto.org";}
+        if (doc["data"]["mqttport"])         { this->mqtt_port = (int)(doc["data"]["mqttport"]);} else {this->mqtt_port = 1883;}
+        if (doc["data"]["mqttuser"])         { this->mqtt_username = doc["data"]["mqttuser"].as<String>();} else {this->mqtt_username = "";}
+        if (doc["data"]["mqttpass"])         { this->mqtt_password = doc["data"]["mqttpass"].as<String>();} else {this->mqtt_password = "";}
+        if (doc["data"]["mqttbasepath"])     { this->mqtt_basepath = doc["data"]["mqttbasepath"].as<String>();} else {this->mqtt_basepath = "home/";}
+        if (doc["data"]["UseRandomClientID"]){ if (strcmp(doc["data"]["UseRandomClientID"], "none")==0) { this->mqtt_UseRandomClientID=false;} else {this->mqtt_UseRandomClientID=true;}} else {this->mqtt_UseRandomClientID = true;}
+        if (doc["data"]["SelectConnectivity"]){if (strcmp(doc["data"]["SelectConnectivity"], "wifi")==0) { this->useETH=false;} else {this->useETH=true;}} else {this->useETH = false;}
+        if (doc["data"]["debuglevel"])       { this->debuglevel = _max((int)(doc["data"]["debuglevel"]), 0);} else {this->debuglevel = 0; }
+        if (doc["data"]["SelectLAN"])        { this->LANBoard = doc["data"]["SelectLAN"].as<String>();} else {this->LANBoard = "";}
+        if (doc["data"]["serial_rx"])        { this->serial_rx = (doc["serial_rx"].as<int>());}
+        if (doc["data"]["serial_tx"])        { this->serial_tx = (doc["serial_tx"].as<int>());}
+        if (doc["data"]["sel_auth"])         { if (strcmp(doc["data"]["sel_auth"], "off")==0) { this->useAuth=false;} else {this->useAuth=true;}} else {this->useAuth = false;}
+        if (doc["data"]["auth_user"])        { this->auth_user = doc["data"]["auth_user"].as<String>();} else {this->auth_user = "admin";}
+        if (doc["data"]["auth_pass"])        { this->auth_pass = doc["data"]["auth_pass"].as<String>();} else {this->auth_pass = "password";}
+        
       } else {
-        if (this->GetDebugLevel() >=1) {Serial.println("failed to load json config, load default config");}
+        if (this->GetDebugLevel() >=1) {dbg.println("failed to load json config, load default config");}
         loadDefaultConfig = true;
       }
     }
   } else {
-    if (this->GetDebugLevel() >=3) {Serial.println("BaseConfig.json config File not exists, load default config");}
+    if (this->GetDebugLevel() >=3) {dbg.println("baseconfig.json config File not exists, load default config");}
     loadDefaultConfig = true;
   }
 
@@ -74,7 +84,7 @@ void BaseConfig::LoadJsonConfig() {
 }
 
 const String BaseConfig::GetReleaseName() {
-  return String(Release) + "(@" + GIT_BRANCH + ")"; 
+  return String(Release) + "(" + String(GITHUB_RUN) + "@" + String(GIT_BRANCH) + ")"; 
 }
 
 void BaseConfig::GetInitData(AsyncResponseStream *response) {
@@ -92,6 +102,19 @@ void BaseConfig::GetInitData(AsyncResponseStream *response) {
   json["data"]["sel_eth"]     = ((this->useETH)?1:0);
   json["data"]["sel_URCID1"]  = ((this->mqtt_UseRandomClientID)?0:1);
   json["data"]["sel_URCID2"]  = ((this->mqtt_UseRandomClientID)?1:0);
+  json["data"]["sel_auth_off"]= ((this->useAuth)?0:1);
+  json["data"]["sel_auth_on"] = ((this->useAuth)?1:0);
+  json["data"]["auth_user"]   = this->auth_user;
+  json["data"]["auth_pass"]   = this->auth_pass;
+
+
+  #ifdef USE_WEBSERIAL
+    json["data"]["tr_serial_rx"]["className"] = "hide";
+    json["data"]["tr_serial_tx"]["className"] = "hide";
+  #else
+    json["data"]["GpioPin_serial_rx"] = this->serial_rx;
+    json["data"]["GpioPin_serial_tx"] = this->serial_tx;
+  #endif
 
   json["response"].to<JsonObject>();
   json["response"]["status"] = 1;
