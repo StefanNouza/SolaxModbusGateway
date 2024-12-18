@@ -16,15 +16,13 @@ MyWebServer::MyWebServer(AsyncWebServer *server, DNSServer* dns): DoReboot(false
   server->on("/getitems",               HTTP_GET, std::bind(&MyWebServer::handleGetItemJson, this, std::placeholders::_1));
   server->on("/getregister",            HTTP_GET, std::bind(&MyWebServer::handleGetRegisterJson, this, std::placeholders::_1));
 
-  server->on("/update",                 HTTP_GET, std::bind(&MyWebServer::handle_update_page, this, std::placeholders::_1));
-
-  server->on("/update",                 HTTP_POST, std::bind(&MyWebServer::handle_update_response, this, std::placeholders::_1),
-                                                   std::bind(&MyWebServer::handle_update_progress, this, std::placeholders::_1, 
-                                                          std::placeholders::_2,
-                                                          std::placeholders::_3,
-                                                          std::placeholders::_4,
-                                                          std::placeholders::_5,
-                                                          std::placeholders::_6));
+  ElegantOTA.begin(server);    // Start ElegantOTA
+  ElegantOTA.setGitEnv(String(GIT_OWNER), String(GIT_REPO), String(GIT_BRANCH));
+  ElegantOTA.setFWVersion(Config->GetReleaseName());
+  // ElegantOTA callbacks
+  //ElegantOTA.onStart(onOTAStart);
+  //ElegantOTA.onProgress(onOTAProgress);
+  ElegantOTA.onEnd(std::bind(&MyWebServer::onOTAEnd, this, std::placeholders::_1));
 
   if (Config->GetUseAuth()) {
     server->serveStatic("/", LittleFS, "/", "max-age=3600")
@@ -42,54 +40,22 @@ MyWebServer::MyWebServer(AsyncWebServer *server, DNSServer* dns): DoReboot(false
   } else {
     mqtt->improvSerial.onImprovConnected(std::bind(&MyWebServer::onImprovWiFiConnectedCb, this, std::placeholders::_1, std::placeholders::_2));
   }
-  
+}
+
+void MyWebServer::onOTAEnd(bool success) {
+  if (success) {
+    dbg.println("OTA Success! Rebooting ...");
+    this->DoReboot = true;
+  } else {
+    dbg.println("OTA Failed! Rebooting ...");
+    this->DoReboot = true;
+  }
 }
 
 void MyWebServer::onImprovWiFiConnectedCb(const char *ssid, const char *password)
 {
   server->begin();
   dbg.println(F("WebServer has been started now ..."));
-}
-
-void MyWebServer::handle_update_page(AsyncWebServerRequest *request) {
-  AsyncWebServerResponse *response = request->beginResponse(200, "text/html", HTML_UPDATEPAGE);
-  response->addHeader("Server","ESP Async Web Server");
-  request->send(response); 
-}
-
-void MyWebServer::handle_update_response(AsyncWebServerRequest *request) {
-  request->send(LittleFS, "/web/reboot.html", "text/html");
-}
-
-void MyWebServer::handle_update_progress(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final) {
-  
-  if(!index){
-      dbg.printf("Update Start: %s\n", filename.c_str());
-      //Update.runAsync(true);
-      
-      if (filename == "filesystem") {
-        if(!Update.begin(LittleFS.totalBytes(), U_SPIFFS)) {
-          Update.printError(Serial);
-        }
-      } else {
-        if(!Update.begin((ESP.getFreeSketchSpace() - 0x1000) & 0xFFFFF000)){
-          Update.printError(Serial);
-        }
-      }
-  }
-  if(!Update.hasError()){
-    if(Update.write(data, len) != len){
-        Update.printError(Serial);
-    }
-  }
-  if(final){
-    if(Update.end(true)){
-      dbg.printf("Update Success: %uB\n", index+len);
-      this->DoReboot = true;//Set flag so main loop can issue restart call
-    } else {
-      Update.printError(Serial);
-    }
-  }
 }
 
 void MyWebServer::loop() {
@@ -104,6 +70,7 @@ void MyWebServer::loop() {
       ESP.restart();
     }
   }
+  ElegantOTA.loop();
 }
 
 void MyWebServer::handleNotFound(AsyncWebServerRequest *request) {
@@ -115,7 +82,7 @@ void MyWebServer::handleRoot(AsyncWebServerRequest *request) {
 }
 
 void MyWebServer::handleFavIcon(AsyncWebServerRequest *request) {
-  AsyncWebServerResponse *response = request->beginResponse_P(200, "image/x-icon", FAVICON, sizeof(FAVICON));
+  AsyncWebServerResponse *response = request->beginResponse(200, "image/x-icon", FAVICON, sizeof(FAVICON));
   response->addHeader("Content-Encoding", "gzip");
   request->send(response);
 }

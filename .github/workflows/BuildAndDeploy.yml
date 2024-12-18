@@ -25,6 +25,7 @@ jobs:
     env:
       REPOSITORY: ${{ github.event.repository.name }}
       BRANCH_NAME: ${{ github.base_ref || github.ref_name }}
+      GITHUB_RUN: ${{ github.run_number }}
 
     outputs:
       fw_version: ${{ steps.json_params.outputs.version }}
@@ -69,7 +70,7 @@ jobs:
         run: |
           platformio run -e ${{ matrix.variant.firmware }}
           if [ -d "data" ]; then
-            platformio run --target buildfs -e ${{ matrix.variant.firmware }}
+            platformio run --target buildfs -e ${{ matrix.variant.firmware }} --build-flag="-DGITHUB_RUN=\"${{ env.GITHUB_RUN }}\""
           fi
           python .github/scripts/createMergedFirmware.py \
             --ChipFamily ${{ matrix.variant.architecture }} \

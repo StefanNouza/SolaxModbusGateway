@@ -7,6 +7,9 @@ Release 3.3.0:
   - new feature: defining multiple requests for id-data (thanks to @Lazgar) (#89)
   - new feature: add web-installer
   - new feature: use ImprovWiFi, remove ESPWifiManager
+  - add donation button for paid extensions
+  - replace customOTA to custom ElegantOTA
+  - move config files from root to subfolder /config
 
 Release 3.2.2:
   - new feature: GoodWe Support, by @TigerGrey (#58)
