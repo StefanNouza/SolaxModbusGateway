@@ -352,7 +352,7 @@ function onSubmit(DataForm, separator='') {
   var textToSaveAsBlob = new Blob([JSON.stringify(JsonData)], {type:"text/plain"});
   
   const formData = new FormData();
-  formData.append(filename + ".json", textToSaveAsBlob, '/' + filename + ".json");
+  formData.append(filename + ".json", textToSaveAsBlob, '/config/' + filename + ".json");
     
     fetch('/doUpload', {
       method: 'POST',

@@ -235,7 +235,7 @@ void modbus::LoadInverterConfigFromJson() {
 
   File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
   if (!regfile) {
-    dbg.println("failed to open ModbusConfig.json file for writing");
+    dbg.printf("failed to open %s file\n", this->InverterType.filename.c_str());
   }
 
   filter[this->InverterType.name]["config"] = true;
@@ -652,7 +652,7 @@ void modbus::ParseData() {
     
     File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
     if (!regfile) {
-      dbg.println("failed to open ModbusConfig.json file for writing");
+      dbg.printf("failed to open %s file\n", this->InverterType.filename.c_str());
     }
     String streamString = "";
     streamString = "\""+ this->InverterType.name +"\": {";
@@ -989,7 +989,7 @@ void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
   
   File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
   if (!regfile) {
-    dbg.println("failed to open ModbusConfig.json file for writing");
+    dbg.printf("failed to open %s file\n", this->InverterType.filename.c_str());
     return;
   }
   String streamString = "";
@@ -1081,7 +1081,7 @@ void modbus::LoadRegItems(std::vector<reg_t>* vector, String type) {
 
   File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
   if (!regfile) {
-    dbg.println("failed to open ModbusConfig.json file for writing");
+    dbg.printf("failed to open %s file\n", this->InverterType.filename.c_str());
     return;
   }
 
@@ -1152,10 +1152,10 @@ void modbus::LoadJsonConfig(bool firstrun) {
   uint8_t pin_Relay2_old   = this->pin_Relay2;
   bool enableRelays_old  = this->enableRelays;
 
-  if (LittleFS.exists("/modbusconfig.json")) {
+  if (LittleFS.exists("/config/modbusconfig.json")) {
     //file exists, reading and loading
     if (Config->GetDebugLevel() >=3) dbg.println("reading config file....");
-    File configFile = LittleFS.open("/modbusconfig.json", "r");
+    File configFile = LittleFS.open("/config/modbusconfig.json", "r");
     if (configFile) {
       if (Config->GetDebugLevel() >=3) dbg.println("config file is open:");
       //size_t size = configFile.size();
@@ -1262,10 +1262,10 @@ void modbus::LoadJsonConfig(bool firstrun) {
 *******************************************************/
 void modbus::LoadJsonItemConfig() {
   
-  if (LittleFS.exists("/modbusitemconfig.json")) {
+  if (LittleFS.exists("/config/modbusitemconfig.json")) {
     //file exists, reading and loading
     if (Config->GetDebugLevel() >=3) dbg.println("reading modbus item config file....");
-    File configFile = LittleFS.open("/modbusitemconfig.json", "r");
+    File configFile = LittleFS.open("/config/modbusitemconfig.json", "r");
     if (configFile) {
       if (Config->GetDebugLevel() >=3) dbg.println("modbus item config file is open:");
 

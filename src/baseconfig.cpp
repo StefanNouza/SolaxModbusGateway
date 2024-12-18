@@ -4,7 +4,11 @@ BaseConfig::BaseConfig() : debuglevel(0), serial_rx(3), serial_tx(1), useAuth(fa
   #ifdef ESP8266
     LittleFS.begin();
   #elif ESP32
-    if (!LittleFS.begin(true)) { // true: format LittleFS/NVS if mount fails
+    if (LittleFS.begin(true)) { // true: format LittleFS/NVS if mount fails
+      if (!LittleFS.exists("/config")) {
+        LittleFS.mkdir("/config");
+      }
+    } else {
       dbg.println("LittleFS Mount Failed");
     }
   #endif
@@ -18,10 +22,10 @@ BaseConfig::BaseConfig() : debuglevel(0), serial_rx(3), serial_tx(1), useAuth(fa
 
 void BaseConfig::LoadJsonConfig() {
   bool loadDefaultConfig = false;
-  if (LittleFS.exists("/baseconfig.json")) {
+  if (LittleFS.exists("/config/baseconfig.json")) {
     //file exists, reading and loading
     dbg.println("reading config file");
-    File configFile = LittleFS.open("/baseconfig.json", "r");
+    File configFile = LittleFS.open("/config/baseconfig.json", "r");
     if (configFile) {
       dbg.println("opened config file");
       
@@ -53,7 +57,7 @@ void BaseConfig::LoadJsonConfig() {
       }
     }
   } else {
-    if (this->GetDebugLevel() >=3) {dbg.println("BaseConfig.json config File not exists, load default config");}
+    if (this->GetDebugLevel() >=3) {dbg.println("baseconfig.json config File not exists, load default config");}
     loadDefaultConfig = true;
   }
 
@@ -80,7 +84,7 @@ void BaseConfig::LoadJsonConfig() {
 }
 
 const String BaseConfig::GetReleaseName() {
-  return String(Release) + "(@" + GIT_BRANCH + ")"; 
+  return String(Release) + "(" + String(GITHUB_RUN) + "@" + GIT_BRANCH + ")"; 
 }
 
 void BaseConfig::GetInitData(AsyncResponseStream *response) {
