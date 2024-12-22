@@ -84,7 +84,7 @@ void BaseConfig::LoadJsonConfig() {
 }
 
 const String BaseConfig::GetReleaseName() {
-  return String(Release) + "(" + String(GITHUB_RUN) + "@" + String(GIT_BRANCH) + ")"; 
+  return String(Release) + "(@" + String(GIT_BRANCH) + ")"; 
 }
 
 void BaseConfig::GetInitData(AsyncResponseStream *response) {
