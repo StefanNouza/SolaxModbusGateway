@@ -956,19 +956,19 @@ void modbus::GetLiveDataAsJson(AsyncResponseStream *response, String subaction) 
     if (subaction == "onlyactive" && !this->InverterLiveData->at(i).active)  continue;
     JsonDocument doc;
     String s = "";
-    doc["name"]  = this->InverterLiveData->at(i).Name.c_str();
-    doc["realname"]  = this->InverterLiveData->at(i).RealName.c_str();
-    doc["value"] = this->InverterLiveData->at(i).value + " " + this->InverterLiveData->at(i).unit;
-    doc["active"].to<JsonObject>();
+    
+    doc["name"]       = this->InverterLiveData->at(i).Name.c_str();
+    doc["realname"]   = this->InverterLiveData->at(i).RealName.c_str();
+    doc["value"]      = std::move(this->InverterLiveData->at(i).value + " " + this->InverterLiveData->at(i).unit);
     doc["active"]["checked"] = (this->InverterLiveData->at(i).active?1:0);
     doc["active"]["name"] = this->InverterLiveData->at(i).Name.c_str();
-    doc["mqtttopic"] = this->mqtt->getTopic(this->InverterLiveData->at(i).Name, false).c_str();
-
+    doc["mqtttopic"]  = std::move(this->mqtt->getTopic(this->InverterLiveData->at(i).Name, false));
+    
     if (this->InverterLiveData->at(i).openwb.length() > 0) {
       JsonArray wb = doc["openwb"].to<JsonArray>();
       wb[0]["openwbtopic"]  = this->InverterLiveData->at(i).openwb.c_str();
     }
-
+    
     serializeJson(doc, s);
     if(count>0) response->print(", ");
     response->print(s);

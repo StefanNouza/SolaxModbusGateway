@@ -283,9 +283,9 @@ void MQTT::Publish_String(const char* subtopic, String value, bool fulltopic) {
 
 String MQTT::getTopic(String subtopic, bool fulltopic) {
   if (!fulltopic) {
-      subtopic = this->mqtt_basepath + "/" + this->mqtt_root +  "/" + subtopic;
+    return std::move(this->mqtt_basepath + "/" + this->mqtt_root +  "/" + subtopic);
   }
-  return subtopic;
+  return std::move(subtopic);
 }
 
 void MQTT::Publish_IP() { 

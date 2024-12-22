@@ -18,11 +18,14 @@ MyWebServer::MyWebServer(AsyncWebServer *server, DNSServer* dns): DoReboot(false
 
   ElegantOTA.begin(server);    // Start ElegantOTA
   ElegantOTA.setGitEnv(String(GIT_OWNER), String(GIT_REPO), String(GIT_BRANCH));
-  ElegantOTA.setFWVersion(Config->GetReleaseName());
+  ElegantOTA.setFWVersion(String(Config->GetReleaseName() + " / Build: " + GITHUB_RUN ));
+  ElegantOTA.setBackupRestoreFS("/config");
+  ElegantOTA.setAutoReboot(true);
+  
   // ElegantOTA callbacks
   //ElegantOTA.onStart(onOTAStart);
   //ElegantOTA.onProgress(onOTAProgress);
-  ElegantOTA.onEnd(std::bind(&MyWebServer::onOTAEnd, this, std::placeholders::_1));
+  //ElegantOTA.onEnd(std::bind(&MyWebServer::onOTAEnd, this, std::placeholders::_1));
 
   if (Config->GetUseAuth()) {
     server->serveStatic("/", LittleFS, "/", "max-age=3600")
@@ -42,15 +45,6 @@ MyWebServer::MyWebServer(AsyncWebServer *server, DNSServer* dns): DoReboot(false
   }
 }
 
-void MyWebServer::onOTAEnd(bool success) {
-  if (success) {
-    dbg.println("OTA Success! Rebooting ...");
-    this->DoReboot = true;
-  } else {
-    dbg.println("OTA Failed! Rebooting ...");
-    this->DoReboot = true;
-  }
-}
 
 void MyWebServer::onImprovWiFiConnectedCb(const char *ssid, const char *password)
 {
