@@ -748,7 +748,14 @@ void modbus::ParseData() {
           IsActiveItem = true;
         }
       }
-      
+      //Lazgar
+      // check if item is active to send data out via mqtt
+      for (uint16_t i=0; i < this->InverterIdData->size(); i++) {
+        if (this->InverterIdData->at(i).Name == d.Name && this->InverterIdData->at(i).active) {
+         IsActiveItem = true;
+        }
+      }
+      //Lazgar
       // ************* processing data ******************
       if (datatype == "float") {
         //********** handle Datatype FLOAT ***********//
@@ -974,7 +981,29 @@ void modbus::GetLiveDataAsJson(AsyncResponseStream *response, String subaction) 
     response->print(s);
     count++;
   }
-  
+  //Lazgar
+  for (uint16_t i=0; i < this->InverterIdData->size(); i++) {
+    if (subaction == "onlyactive" && !this->InverterIdData->at(i).active)  continue;
+    JsonDocument doc;
+    String s = "";
+    doc["name"] = this->InverterIdData->at(i).Name.c_str();
+    doc["realname"] = this->InverterIdData->at(i).RealName.c_str();
+    doc["value"] = std::move(this->InverterIdData->at(i).value + " " + this->InverterIdData->at(i).unit);
+    doc["active"]["checked"] = (this->InverterIdData->at(i).active?1:0);
+    doc["active"]["name"] = this->InverterIdData->at(i).Name.c_str();
+    doc["mqtttopic"] = std::move(this->mqtt->getTopic(this->InverterIdData->at(i).Name, false));
+    //Wird für die ID Daten nicht benötigt gibt keine Infos für die OpenWallbox
+    //if (this->InverterIdData->at(i).openwb.length() > 0) {
+    //  JsonArray wb = doc["openwb"].to<JsonArray>();
+    //  wb[0]["openwbtopic"]  = this->InverterIdData->at(i).openwb.c_str();
+    //}
+
+    serializeJson(doc, s);
+    if(count>0) response->print(", ");
+    response->print(s);
+    count++;
+  }
+  //Lazgar
   response->printf(" ]}, \"object_id\": \"%s/%s\"}", Config->GetMqttBasePath().c_str(), Config->GetMqttRoot().c_str());
 }
 
@@ -1022,7 +1051,38 @@ void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
     count++;
 
   } while (regfile.findUntil(",","]"));
+  //Lazgar
+  streamString = "";
+  streamString = "\""+ this->InverterType.name +"\": {";
+  regfile.find(streamString.c_str());
 
+  streamString = "\"id\": [";
+  regfile.find(streamString.c_str());
+
+  do {
+    JsonDocument elem;
+    DeserializationError error = deserializeJson(elem, regfile); 
+
+    if (!error) {
+      // Print the result
+      if (Config->GetDebugLevel() >=4) {dbg.println("parsing JSON ok"); }
+      if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
+    } else {
+      if (Config->GetDebugLevel() >=1) {
+        dbg.print("(Function GetRegisterAsJson) Failed to parse JSON Register Data: "); 
+        dbg.print(error.c_str()); 
+        dbg.println();
+      }
+    }
+
+    String s = "";
+    serializeJson(elem, s);
+    if(count>0) response->print(", ");
+    response->print(s);
+    count++;
+
+  } while (regfile.findUntil(",","]"));
+  //Lazgar
   if (regfile) { regfile.close(); }
   response->print("]}");
 }
@@ -1040,6 +1100,16 @@ void modbus::SetItemActiveStatus(String item, bool newstate) {
       this->InverterLiveData->at(j).active = newstate;
     }
   }
+  //Lazgar
+  for (uint16_t j=0; j < this->InverterIdData->size(); j++) {
+    if (this->InverterIdData->at(j).Name == item) {
+      if (Config->GetDebugLevel() >=3) {
+        dbg.printf("Set Item <%s> ActiveState to %s\n", item.c_str(), (newstate?"true":"false"));
+      }
+      this->InverterIdData->at(j).active = newstate;
+    }
+  }
+  //Lazgar
 }
 
 /*******************************************************
@@ -1304,6 +1374,19 @@ void modbus::LoadJsonItemConfig() {
               break;
             }
           }
+	  //Lazgar
+          for(uint16_t i=0; i<this->InverterIdData->size(); i++) {
+            if (this->InverterIdData->at(i).Name == ItemName ) {
+              this->InverterIdData->at(i).active = kv.value().as<bool>();
+
+              if (Config->GetDebugLevel() >=3) {
+                dbg.printf("item %s -> %s\n", ItemName, (this->InverterIdData->at(i).active?"enabled":"disabled"));
+              }
+
+              break;
+            }
+          }
+	  //Lazgar
         }
 
       } while (stream.findUntil(",","]"));
