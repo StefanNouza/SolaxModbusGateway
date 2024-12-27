@@ -1,11 +1,10 @@
 #ifndef MQTT_H
 #define MQTT_H
 
-#include "commonlibs.h" 
+#include "baseconfig.h"
 #include <PubSubClient.h>
 #include <ImprovWiFiLibrary.h>
 #include <vector>
-#include "baseconfig.h"
 
 #ifdef ESP8266
   //#define SetHostName(x) wifi_station_set_hostname(x);

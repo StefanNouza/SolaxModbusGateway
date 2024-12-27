@@ -29,7 +29,7 @@ void BaseConfig::LoadJsonConfig() {
       DeserializationError error = deserializeJson(doc, configFile);
       
       if (!error && doc["data"]) {
-        serializeJsonPretty(doc, dbg);
+        serializeJsonPretty(doc, dbg); dbg.println();
         
         if (doc["data"]["mqttroot"])         { this->mqtt_root = doc["data"]["mqttroot"].as<String>();} else {this->mqtt_root = "solax";}
         if (doc["data"]["mqttserver"])       { this->mqtt_server = doc["data"]["mqttserver"].as<String>();} else {this->mqtt_server = "test.mosquitto.org";}
@@ -58,11 +58,11 @@ void BaseConfig::LoadJsonConfig() {
   }
 
   if (loadDefaultConfig) {
+    this->mqtt_root = "Solax";
     this->mqtt_server = "test.mosquitto.org";
     this->mqtt_port  = 1883;
     this->mqtt_username = "";
     this->mqtt_password = "";
-    this->mqtt_root = "Solax";
     this->mqtt_basepath = "home/";
     this->mqtt_UseRandomClientID = true;
     this->useETH = false;

@@ -1,4 +1,5 @@
 #include "mqtt.h"
+#include "modbus.h"
 
 MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint16_t MqttPort, String MqttBasepath, String MqttRoot, char* APName, char* APpassword): 
   server(server), 
@@ -61,14 +62,16 @@ MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint1
 
   } else {
     // use Wifi
-    improvSerial.ConnectToWifi();
+    if(improvSerial.ConnectToWifi()) {if (Config->GetDebugLevel() >=4) WiFi.printDiag(dbg);} // printDiag() nur ausführen, wenn ConnectToWifi() OK ist
+    else                             {dbg.printf("ConnectToWiFi() failed\n");}
   }
-
-  if (Config->GetDebugLevel() >=4) WiFi.printDiag(dbg);
 
   dbg.printf("Initializing MQTT (%s:%d)\n", Config->GetMqttServer().c_str(), Config->GetMqttPort());
   espClient = WiFiClient();
-  
+
+  #ifdef JSON_MQTT
+  PubSubClient::setBufferSize(JSON_MSG_BUFFER+100); // set big buffer to handle complex JSON-answer for livedata
+  #endif
   PubSubClient::setClient(espClient);
   PubSubClient::setServer(Config->GetMqttServer().c_str(), Config->GetMqttPort());
 }
@@ -224,10 +227,10 @@ void MQTT::reconnect() {
   }
   snprintf(LWT, sizeof(LWT), "%s/state", this->mqtt_root.c_str());
   
-  dbg.printf("Attempting MQTT connection as %s \n", topic);
+  dbg.printf("Attempting MQTT connection as %s\n", topic);
   
   if (PubSubClient::connect(topic, Config->GetMqttUsername().c_str(), Config->GetMqttPassword().c_str(), LWT, true, false, "Offline")) {
-    dbg.println("connected... ");
+    dbg.println("connected...");
     // Once connected, publish basics ...
     this->Publish_IP();
     this->Publish_String("version", Config->GetReleaseName(), false);
@@ -274,7 +277,7 @@ void MQTT::Publish_String(const char* subtopic, String value, bool fulltopic) {
   String topic = this->getTopic(String(subtopic), fulltopic);
 
   if (PubSubClient::connected()) {
-    PubSubClient::publish((const char*)topic.c_str(), value.c_str(), true);
+    PubSubClient::publish((const char*)topic.c_str(), (const char*)value.c_str(), true);
     if (Config->GetDebugLevel() >=3) {
       dbg.printf("Publish %s: %s \n", topic.c_str(), value.c_str());
     }

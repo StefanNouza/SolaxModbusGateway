@@ -12,7 +12,12 @@
 #include <iomanip>
 #include <sstream>
 
-//#define DEBUGMODE
+#define DEBUGMODE
+
+#define JSON_MQTT               // define to get MQTT-data in one big JSON-answer (good for FHEM-based systems)
+#define JSON_MSG_BUFFER 4000    // [byte] set up a buffer big enough to handle the JSON-answer
+
+#define RS485_READ_TIMEOUT 850  // [ms] timeout between modbus request and answer, Growatt demands 800ms, so we set 850ms
 
 class modbus {
 
@@ -68,12 +73,12 @@ class modbus {
     uint8_t                 default_pin_TX;       // Serial Transmit pin
     uint8_t                 default_pin_RTS;      // Direction control pin
     
-    uint8_t          	      pin_Relay1;           // Pin zum Abfragen des ersten Potetialfreien Kontakts
-    uint8_t           	    default_pin_Relay1;   // Pin zum Abfragen des ersten Potetialfreien Kontakts
-    uint8_t           	    pin_Relay2;           // Pin zum Abfragen des zweiten Potetialfreien Kontakts
-    uint8_t           	    default_pin_Relay2;   // Pin zum Abfragen des zweiten Potetialfreien Kontakts
-    uint8_t           	    state_Relay1;         // Status des ersten Potetialfreien Kontakts
-    uint8_t          	      state_Relay2;         // Status des zweiten Potetialfreien Kontakts
+    uint8_t          	      pin_Relay1;           // Pin zum Abfragen des ersten potentialfreien Kontakts
+    uint8_t           	    default_pin_Relay1;   // Pin zum Abfragen des ersten potentialfreien Kontakts
+    uint8_t           	    pin_Relay2;           // Pin zum Abfragen des zweiten potentialfreien Kontakts
+    uint8_t           	    default_pin_Relay2;   // Pin zum Abfragen des zweiten potentialfreien Kontakts
+    uint8_t           	    state_Relay1;         // Status des ersten potentialfreien Kontakts
+    uint8_t          	      state_Relay2;         // Status des zweiten potentialfreien Kontakts
     bool                    enableRelays;         // enable reading Relays
 
     uint8_t                 ClientID;             // 0x01
@@ -87,6 +92,8 @@ class modbus {
     unsigned long           LastTxLiveData = 0;
     unsigned long           LastTxIdData = 0;
     unsigned long           LastTxInverter = 0;
+
+    int                     BpsFactor = 1;        // factor for transmission-timings depending on the baudrate, "1" at 19200bps
 
     std::vector<byte>*      DataFrame;            // storing read results as hexdata to parse
     std::vector<reg_t>*     InverterIdData;       // storing readable results
@@ -150,6 +157,9 @@ class modbus {
 
     HardwareSerial*         RS485Serial;
 
+    #ifdef JSON_MQTT
+    String                  mqttJson = ((char *)0); // set up a null-string first, length will be given in constructor
+    #endif
 };
 
 extern modbus* mb;

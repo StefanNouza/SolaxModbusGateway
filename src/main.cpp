@@ -43,24 +43,33 @@ void myMQTTCallBack(char* topic, byte* payload, unsigned int length) {
 }
 
 void setup() {
-  Serial.begin(115200);
+  //>>> hier wird "Serial" initialisiert und zum Schreiben von Debug-Ausgaben genutzt
+  Serial.begin(115200, SERIAL_8N1);
 
-  dbg.println("Start of Solar Inverter MQTT Gateway"); 
-  dbg.println("Starting BaseConfig");
+  Serial.printf("Start of Solar Inverter MQTT Gateway V%s\n", Release); 
+  Serial.println("Starting BaseConfig");
+
+  //>>> hier wird die Config eingelesen, u.a. die Rx/Tx-Pins für die Debug-Ausgaben
+  //>>> "BaseConfig" nutzt schon "dbg", das im Fall USE_WEBSERIAL noch garnicht initialisiert ist
   Config = new BaseConfig();
 
   #ifndef USE_WEBSERIAL
-    dbg.begin(115200, SERIAL_8N1, Config->GetSerialRx(), Config->GetSerialTx()); // RX, TX, zb.: 33, 32
-    dbg.println("");
-    dbg.println("ready");
+    //Serial.begin(115200, SERIAL_8N1, Config->GetSerialRx(), Config->GetSerialTx()); // RX, TX, zb.: 33, 32 >>> hier würde "Serial" an "BaseConfig" angepasst werden...
+
+    //>>> macht das Setzen der Rx/Tx-Pins für die Debug-Schnittstelle überhaupt Sinn?
+    //>>>  - die ganzen Dev-Boards haben doch eine feste Verdrahtung der USB-Schnittstelle.
   #endif
 
+  //>>> erst jetzt wird WebSerial initialisiert, das aber schon im Einsatz war...
   #ifdef USE_WEBSERIAL
     WebSerial.onMessage([](const String& msg) { Serial.println(msg); });
-    WebSerial.begin(&server);
     WebSerial.setBuffer(100);
+    WebSerial.begin(&server);
   #endif
-  
+  //>>> ab hier ist "dbg" sauber initialisiert
+  dbg.println("");
+  dbg.println("ready");
+
   dbg.println("Starting Wifi and MQTT");
   mqtt = new MQTT(&server, &dns, 
                     Config->GetMqttServer().c_str(), 
