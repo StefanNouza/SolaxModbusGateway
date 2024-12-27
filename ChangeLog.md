@@ -1,4 +1,5 @@
 Release 3.3.1:
+  - BugFix: fix null-terminationof string handling (#96)
   - ToDo: support for OpenWB 2.0 Api
 
 Release 3.3.0:

@@ -772,12 +772,13 @@ void modbus::ParseData() {
       } else if (datatype == "string") {
         //********** handle Datatype String ***********//
         if (!posArray.isNull()) { 
-          char buffer[posArray.size()];
+          char buffer[posArray.size()+1];
           uint8_t i=0;
           for(int v : posArray) {
             buffer[i] = static_cast<char>(DataFrame->at(v));
             i++;
           }
+          buffer[i] = '\0';
           d.value = String(buffer);
         } 
       } else {
