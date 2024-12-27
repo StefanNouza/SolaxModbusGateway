@@ -243,7 +243,7 @@ void modbus::LoadInverterConfigFromJson() {
 
   File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
   if (!regfile) {
-    dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename);
+    dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename.c_str());
   }
 
   filter[this->InverterType.name]["config"] = true;
@@ -687,7 +687,7 @@ void modbus::ParseData() {
 
     File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
     if (!regfile) {
-      dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename);
+      dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename.c_str());
     }
     String streamString = "";
     streamString = "\""+ this->InverterType.name +"\": {";
@@ -1049,7 +1049,7 @@ void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
   
   File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
   if (!regfile) {
-    dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename);
+    dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename.c_str());
     return;
   }
   String streamString = "";
@@ -1144,7 +1144,7 @@ void modbus::LoadRegItems(std::vector<reg_t>* vector, String type) {
 
   File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
   if (!regfile) {
-    dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename);
+    dbg.printf("failed to open /regs/%s file\n", this->InverterType.filename.c_str());
     return;
   }
 
