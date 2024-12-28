@@ -1,6 +1,13 @@
 #include "mqtt.h"
 #include "modbus.h"
 
+// if IMPROV is not doing the job:
+//  - activate and fill the 2 defines, compile, download and run once
+//    your wifi-crerdential will be put into NVS-memory like IMPROV does
+//  - deactivate the defines, compile and download - now WiFi should work
+//define NONIMPROVSSID "myWiFiSSID"
+//define NONIMPROVPWD  "myWiFiPassword"
+
 MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint16_t MqttPort, String MqttBasepath, String MqttRoot, char* APName, char* APpassword): 
   server(server), 
   dns(dns), 
@@ -14,6 +21,23 @@ MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint1
   this->subscriptions = new std::vector<String>{};
  
   WiFi.setHostname(this->mqtt_root.c_str());
+
+  // only to put the wifi-credentials into NVS-memory offline without connecting IMPROV by web
+  #ifdef NONIMPROVSSID
+    #ifdef NONIMPROVPWD
+      dbg.println("setting WiFi SSID and password by include");
+
+      Preferences preferences;
+      if (preferences.begin("wifi", false)) {             // create or open namespace wifi
+        preferences.putString("ssid", NONIMPROVSSID);     
+        preferences.putString("password", NONIMPROVPWD);
+        preferences.end();
+        dbg.println("WiFi credentials saved to NVS");
+      } else {
+        dbg.println("Failed to write WiFi credentials to NVS");
+      }
+    #endif
+  #endif
 
 #ifdef ESP32  
   WiFi.onEvent(std::bind(&MQTT::WifiOnEvent, this, std::placeholders::_1));
