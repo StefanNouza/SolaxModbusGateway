@@ -389,12 +389,21 @@ void MQTT::loop() {
     if (Config->GetDebugLevel() >=4) {
       char buffer[100] = {0};
       memset(buffer, 0, sizeof(buffer));
-      
-      snprintf(buffer, sizeof(buffer), "%d", ESP.getFreeHeap());
+
+      snprintf(buffer, sizeof(buffer), "%d", ESP.getFreeHeap() / 1024);
       this->Publish_String("memory", buffer, false);
 
       snprintf(buffer, sizeof(buffer), "%d", WiFi.RSSI());
       this->Publish_String("rssi", buffer, false);
+
+      snprintf(buffer, sizeof(buffer), "%s", WiFi.SSID());
+      this->Publish_String("ssid", buffer, false);
+      
+      uint64_t uptimeMicroSeconds = esp_timer_get_time();
+      uint64_t uptimeSeconds = uptimeMicroSeconds / 1000000;
+      this->Publish_Int("uptime",uptimeSeconds,false);
+
+      
     }
   }
 }
