@@ -19,8 +19,8 @@
         "version": "2.0",
         "topics": [
             { "setpvw": "openWB/set/pv/#InverterID#/get/power" },
-            { "setpv1w": "openWB/set/pv/1/W"},
-            { "setpv2w": "openWB/set/pv/2/W" },
+            { "setpv1w": ""},
+            { "setpv2w": "" },
             { "setbatw": "openWB/set/bat/#BatteryID#/get/power"},
             { "setbatsoc": "openWB/set/bat/#BatteryID#/get/soc"},
             { "setbatexpwh": "openWB/set/bat/#BatteryID#/get/exported"},
