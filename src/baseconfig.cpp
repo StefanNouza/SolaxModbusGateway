@@ -3,7 +3,7 @@
 BaseConfig::BaseConfig() : debuglevel(0), serial_rx(3), serial_tx(1), useAuth(false) {  
   #ifdef ESP8266
     LittleFS.begin();
-  #elif ESP32
+  #elif defined(ESP32)
     if (LittleFS.begin(true)) { // true: format LittleFS/NVS if mount fails
       if (!LittleFS.exists("/config")) {
         LittleFS.mkdir("/config");
@@ -121,4 +121,21 @@ void BaseConfig::GetInitData(AsyncResponseStream *response) {
   json["response"]["text"] = "successful";
   serializeJson(json, ret);
   response->print(ret);
+}
+
+void BaseConfig::log(const int loglevel, const char* format, ...) {
+  if (this->GetDebugLevel() < loglevel) return;
+  
+  va_list args;
+  va_start(args, format);
+  char buffer[256];
+  vsnprintf(buffer, sizeof(buffer), format, args);
+  #ifdef USE_WEBSERIAL
+    WebSerial.printf("[Log %d] ", loglevel);
+    WebSerial.println(buffer);
+  #else
+    Serial.printf("[Log %d] ", loglevel);
+    Serial.println(buffer);
+  #endif
+  va_end(args);
 }

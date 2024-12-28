@@ -109,7 +109,7 @@ void MyWebServer::handleReset(AsyncWebServerRequest *request) {
 void MyWebServer::handleWiFiReset(AsyncWebServerRequest *request) {
   #ifdef ESP32
     WiFi.disconnect(true,true);
-  #elif ESP8266  
+  #elif defined(ESP8266)  
     ESP.eraseConfig();
   #endif
   

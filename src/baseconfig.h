@@ -13,6 +13,13 @@ class BaseConfig {
     void      LoadJsonConfig();
     void      GetInitData(AsyncResponseStream *response);
 
+    /**
+    * @brief Wrapper function for logging like Serial.printf
+    * @param format the format string
+    * @param ... the arguments
+    */
+    void log(const int loglevel, const char* format, ...);
+
     const String&   GetMqttServer()    const {return mqtt_server;}
     const uint16_t& GetMqttPort()     const {return mqtt_port;}
     const String&   GetMqttUsername()  const {return mqtt_username;}

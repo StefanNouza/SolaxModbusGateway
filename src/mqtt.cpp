@@ -47,15 +47,22 @@ MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint1
   
   if (Config->GetUseETH()) {
     #ifdef ESP32
-      //ETH.begin(1, 16, 23, 18, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
       eth_shield_t* shield = this->GetEthShield(Config->GetLANBoard());
-      ETH.begin(shield->PHY_ADDR,
+      
+      ETH.begin(shield->PHY_TYPE,
+                  shield->PHY_ADDR,
+                  shield->PHY_MDC,
+                  shield->PHY_MDIO,
+                  shield->PHY_POWER,
+                  shield->CLK_MODE);
+        //ETH.begin(1, 16, 23, 18, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
+/*      ETH.begin(shield->PHY_ADDR,
                 shield->PHY_POWER,
                 shield->PHY_MDC,
                 shield->PHY_MDIO,
                 shield->PHY_TYPE,
                 shield->CLK_MODE);
-    
+*/    
       this->WaitForConnect();
     #endif
 

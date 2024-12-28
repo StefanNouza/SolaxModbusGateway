@@ -11,8 +11,9 @@
 #include <HardwareSerial.h>
 #include <iomanip>
 #include <sstream>
+#include <openwb.h>
 
-//#define DEBUGMODE
+#define DEBUGMODE
 
 class modbus {
 
@@ -50,6 +51,7 @@ class modbus {
     void                    loop();
 
     const String&           GetInverterType()   const {return InverterType.name;}
+    const String            GetOpenWbVersion()  const {return Conf_OpenWBVersion;}
 
     void                    enableMqtt(MQTT* object);
     void                    GetInitData(AsyncResponseStream *response);
@@ -94,9 +96,9 @@ class modbus {
     std::vector<regfiles_t>*AvailableInverters;   // available inverters from JSON
     std::vector<subscription_t>* Setters;         // available set Options from JSON register 
 
-    
     MQTT*                   mqtt = NULL;
-    
+    openwb*                 OpenWB = NULL;
+
     String                  PrintHex(byte num);
     String                  PrintDataFrame(std::vector<byte>* frame);
     String                  PrintDataFrame(byte* frame, uint8_t len);
@@ -140,7 +142,10 @@ class modbus {
     //uint8_t                 Conf_LiveDataFunctionCodePos;
     //uint8_t                 Conf_IdDataFunctionCodePos;
 
-    bool                    Conf_EnableOpenWBTopic;
+    bool                    Conf_EnableOpenWB;
+    String                  Conf_OpenWBVersion;
+    uint8_t                 Conf_OpenWBModulID;
+    uint8_t                 Conf_OpenWBBatteryID;
     bool                    Conf_EnableSetters;
 
     byte                    String2Byte(String s);
