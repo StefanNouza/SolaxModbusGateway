@@ -49,20 +49,21 @@ MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint1
     #ifdef ESP32
       eth_shield_t* shield = this->GetEthShield(Config->GetLANBoard());
       
-      ETH.begin(shield->PHY_TYPE,
+/*      ETH.begin(shield->PHY_TYPE,
                   shield->PHY_ADDR,
                   shield->PHY_MDC,
                   shield->PHY_MDIO,
                   shield->PHY_POWER,
                   shield->CLK_MODE);
+*/
         //ETH.begin(1, 16, 23, 18, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
-/*      ETH.begin(shield->PHY_ADDR,
+      ETH.begin(shield->PHY_ADDR,
                 shield->PHY_POWER,
                 shield->PHY_MDC,
                 shield->PHY_MDIO,
                 shield->PHY_TYPE,
                 shield->CLK_MODE);
-*/    
+    
       this->WaitForConnect();
     #endif
 
@@ -221,10 +222,8 @@ void MQTT::WaitForConnect() {
 void MQTT::reconnect() {
   char topic[50];
   char LWT[50];
-  char buffer[100];
   memset(&LWT[0], 0, sizeof(LWT));
   memset(&topic[0], 0, sizeof(topic));
-  memset(buffer, 0, sizeof(buffer));
   
   if (Config->UseRandomMQTTClientID()) { 
     snprintf (topic, sizeof(topic), "%s-%s", this->mqtt_root.c_str(), String(random(0xffff)).c_str());
@@ -239,11 +238,9 @@ void MQTT::reconnect() {
     dbg.println("connected... ");
     // Once connected, publish basics ...
     this->Publish_IP();
+    this->Publish_String("ssid", WiFi.SSID(), false);
     this->Publish_String("version", Config->GetReleaseName(), false);
     this->Publish_String("state", "Online", false); //LWT reset
-    
-    snprintf(buffer, sizeof(buffer), "%s", WiFi.SSID());
-    this->Publish_String("ssid", buffer, false);
     
     // ... and resubscribe if needed
     for (uint8_t i=0; i< this->subscriptions->size(); i++) {
@@ -396,6 +393,7 @@ void MQTT::loop() {
   }
 
   if (Config->GetDebugLevel() >=4 && millis() - this->last_keepalive > (30 * 1000))  {
+    // send messages for debugging every 30 seconds
     this->last_keepalive = millis();
     
     if (Config->GetDebugLevel() >=4) {
