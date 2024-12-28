@@ -221,8 +221,10 @@ void MQTT::WaitForConnect() {
 void MQTT::reconnect() {
   char topic[50];
   char LWT[50];
+  char buffer[100];
   memset(&LWT[0], 0, sizeof(LWT));
   memset(&topic[0], 0, sizeof(topic));
+  memset(buffer, 0, sizeof(buffer));
   
   if (Config->UseRandomMQTTClientID()) { 
     snprintf (topic, sizeof(topic), "%s-%s", this->mqtt_root.c_str(), String(random(0xffff)).c_str());
@@ -239,6 +241,9 @@ void MQTT::reconnect() {
     this->Publish_IP();
     this->Publish_String("version", Config->GetReleaseName(), false);
     this->Publish_String("state", "Online", false); //LWT reset
+    
+    snprintf(buffer, sizeof(buffer), "%s", WiFi.SSID());
+    this->Publish_String("ssid", buffer, false);
     
     // ... and resubscribe if needed
     for (uint8_t i=0; i< this->subscriptions->size(); i++) {
@@ -396,12 +401,16 @@ void MQTT::loop() {
     if (Config->GetDebugLevel() >=4) {
       char buffer[100] = {0};
       memset(buffer, 0, sizeof(buffer));
-      
-      snprintf(buffer, sizeof(buffer), "%d", ESP.getFreeHeap());
+
+      snprintf(buffer, sizeof(buffer), "%d", ESP.getFreeHeap() / 1024);
       this->Publish_String("memory", buffer, false);
 
       snprintf(buffer, sizeof(buffer), "%d", WiFi.RSSI());
       this->Publish_String("rssi", buffer, false);
+      
+      uint64_t uptimeMicroSeconds = esp_timer_get_time();
+      uint64_t uptimeSeconds = uptimeMicroSeconds / 1000000;
+      this->Publish_Int("uptime",uptimeSeconds,false);
     }
   }
 }
