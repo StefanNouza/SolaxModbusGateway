@@ -422,6 +422,7 @@ void modbus::QueryQueueToInverter() {
 
     if (rwtype == WRITE) {
       this->ReceiveSetData(&m);
+      this->QueryIdData();
     } 
     else if (rwtype == READ) { 
       this->ReceiveReadData();
@@ -461,7 +462,7 @@ bool modbus::ReceiveSetData(std::vector<byte>* SendHexFrame) {
       //ret = true;
     //}
   }
-
+  
   return ret;
 }
 
