@@ -3,7 +3,15 @@
 /*******************************************************
  * Constructor
 *******************************************************/
-modbus::modbus() : enableRelays(false), Baudrate(19200), enableCrcCheck(true), enableLengthCheck(true), LastTxLiveData(0), LastTxIdData(0), LastTxInverter(0) {
+modbus::modbus(): enableRelays(false), 
+                  Baudrate(19200), 
+                  enableCrcCheck(true), 
+                  enableLengthCheck(true), 
+                  LastTxLiveData(0), 
+                  LastTxIdData(0), 
+                  LastTxInverter(0),
+                  Conf_OpenWBModulID(1),
+                  Conf_OpenWBBatteryID(2) {
   DataFrame           = new std::vector<byte>{};
   SaveIdDataframe     = new std::vector<byte>{};
   SaveLiveDataframe   = new std::vector<byte>{};
@@ -950,7 +958,7 @@ void modbus::GetLiveDataAsJson(AsyncResponseStream *response, String subaction) 
     doc["active"]["name"] = this->InverterLiveData->at(i).Name.c_str();
     doc["mqtttopic"]  = std::move(this->mqtt->getTopic(this->InverterLiveData->at(i).Name, false));
     
-    if (this->InverterLiveData->at(i).openwb.length() > 0) {
+    if (this->Conf_EnableOpenWB && this->InverterLiveData->at(i).openwb.length() > 0) {
       JsonArray wb = doc["openwb"].to<JsonArray>();
       wb[0]["openwbtopic"]  = std::move(OpenWB->getOpenWbTopic(this->InverterLiveData->at(i).openwb));
     }
