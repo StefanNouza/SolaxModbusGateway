@@ -1095,6 +1095,14 @@ void modbus::SetItemActiveStatus(String item, bool newstate) {
  * loop function
 *******************************************************/
 void modbus::loop() {
+  // handle requesting ID Data into queue
+  if (millis() - this->LastTxIdData > this->TxIntervalIdData * 1000) {
+    this->LastTxIdData = millis();
+    
+    if (this->InverterType.filename.length() > 1) {this->QueryIdData();}
+  }
+
+  // handle requesting LiveData into queue
   if (millis() - this->LastTxLiveData > this->TxIntervalLiveData * 1000) {
     this->LastTxLiveData = millis();
     
@@ -1104,13 +1112,7 @@ void modbus::loop() {
     }  
    }
 
-  if (millis() - this->LastTxIdData > this->TxIntervalIdData * 1000) {
-    this->LastTxIdData = millis();
-    
-    if (this->InverterType.filename.length() > 1) {this->QueryIdData();}
-  }
-
-  //its allowed to send a new request every 800ms, we use recommend 1000ms
+  //its allowed to send a new request every 800ms, we use recommended 1000ms
   if (millis() - this->LastTxInverter > 1000) {
     this->LastTxInverter = millis();
 
