@@ -7,7 +7,7 @@
             { "setbatsoc": "openWB/set/houseBattery/%Soc"},
             { "setbatexpwh": "openWB/set/houseBattery/WhExported"},
             { "setbatimpwh": "openWB/set/houseBattery/WhImported"},
-            { "setcounterwh": "openWB/set/pv/#InverterID#/WhCounter"},
+            { "setcounterwh": "openWB/set/pv/#InverterID#/WhCounter"}
         ] 
     },
     {
