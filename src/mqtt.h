@@ -10,7 +10,9 @@
 #ifdef ESP8266
   //#define SetHostName(x) wifi_station_set_hostname(x);
   #define ESP_getChipId() ESP.getChipId() 
-#elif ESP32
+#endif
+
+#ifdef ESP32
   #include <ETH.h>
   //#define SetHostName(x) WiFi.getHostname(x); --> MQTT.cpp TODO
   #define ESP_getChipId() (uint32_t)ESP.getEfuseMac()   // Unterschied zu ESP.getFlashChipId() ???
@@ -27,7 +29,7 @@
       eth_phy_type_t  PHY_TYPE;
       eth_clock_mode_t CLK_MODE;
   } eth_shield_t;
-#elif ESP8266
+#elif defined(ESP8266)
   typedef struct {
       String name; 
   } eth_shield_t;
@@ -38,7 +40,7 @@ class MQTT: PubSubClient {
   #ifdef ESP32
     std::vector<eth_shield_t> lan_shields = {{"WT32-ETH01", 1, 16, 23, 18, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN}, 
                                              {"test", 1, 16, 23, 18, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN}};
-  #elif ESP8266
+  #elif defined(ESP8266)
     std::vector<eth_shield_t> lan_shields = {{"test1"}, 
                                              {"test2"}};
   #endif

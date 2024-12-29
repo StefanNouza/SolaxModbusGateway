@@ -24,7 +24,6 @@ BaseConfig* Config = NULL;
 MQTT* mqtt = NULL;
 MyWebServer* mywebserver = NULL;
 
-
 void myMQTTCallBack(char* topic, byte* payload, unsigned int length) {
   String msg;
   if (Config->GetDebugLevel() >=3) {
@@ -45,7 +44,7 @@ void myMQTTCallBack(char* topic, byte* payload, unsigned int length) {
 void setup() {
   Serial.begin(115200);
 
-  dbg.println("Start of Solar Inverter MQTT Gateway"); 
+  dbg.println("Start of Modbus-RTU MQTT Gateway"); 
   dbg.println("Starting BaseConfig");
   Config = new BaseConfig();
 

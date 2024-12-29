@@ -82,26 +82,48 @@
         <tr id='EnableRelays_1'>
           <td>Select connected Pin to read Relay 1</td>
            <td><input min='0' max='255' id='GpioPin_Relay1' name='pin_RELAY1' type='number' style='width: 6em'/></td>
-         </tr>
+        </tr>
  
-         <tr id='EnableRelays_2'>
+        <tr id='EnableRelays_2'>
           <td>Select connected Pin to read Relay 2</td>
            <td><input min='0' max='255' id='GpioPin_Relay2' name='pin_RELAY2' type='number' style='width: 6em'/></td>
-         </tr>
+        </tr>
 
         <tr>
-          <td>Enable OpenWB Compatibility</td>
-          <td>
-            <div class='onoffswitch'>
-              <input type='checkbox' name='enable_openwbtopic' class='onoffswitch-checkbox' id='enable_openwbtopic'>
-              <label class='onoffswitch-label' for='enable_openwbtopic'>
-                <span class='onoffswitch-inner'></span>
-                <span class='onoffswitch-switch'></span>
-              </label>
-            </div>
+          <td colspan='2'>
+          <div class='inline'>
+            <input type='radio' id='EnableOpenWb_On' name='EnableOpenWb' value='1' onclick="radioselection(['EnableOpenWb_1','EnableOpenWb_2','EnableOpenWb_3'],[])"/>
+            <label for='EnableOpenWb_On'>enable OpenWB Support</label>
+          </div>
+          
+          <div class='inline'>
+            <input type='radio' id='EnableOpenWb_Off' name='EnableOpenWb' value='0' onclick="radioselection([],['EnableOpenWb_1','EnableOpenWb_2','EnableOpenWb_3'])"/>
+            <label for='EnableOpenWb_Off'>disable OpenWB Support</label>
+          </div>  
           </td>
         </tr>
-          
+
+        <tr id='EnableOpenWb_1'>
+          <td>Select OpenWB Mqtt API Version</td>
+           <td>
+            <select name='openwbversion' size='1' style='width: 10em'>
+              <template id='openwbversions'>
+                <option id='openwbversion'></option>
+              </template>
+            </select>
+           </td>
+        </tr>
+
+        <tr id='EnableOpenWb_2'>
+          <td>Inverter module ID</td>
+          <td><input min='1' max='99' id='openwbmodulid' name='openwbmodulid' type='number' style='width: 6em'/></td>
+        </tr>
+
+        <tr id='EnableOpenWb_3'>
+          <td>Battery module ID</td>
+          <td><input min='1' max='99' id='openwbbatteryid' name='openwbbatteryid' type='number' style='width: 6em'/></td>
+        </tr>
+
         <tr>
           <td>Enable Dataframe CRC Check</td>
           <td>
