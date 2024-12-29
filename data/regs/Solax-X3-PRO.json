@@ -350,6 +350,7 @@
                     "name": "GridPower",
                     "realname": "GridPower",
                     "datatype": "integer",
+                    "openwbtopic": "setpvw",
                     "unit": "W"
                 },
                 {

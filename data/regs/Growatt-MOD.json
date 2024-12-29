@@ -94,7 +94,6 @@
                     ],
                     "name": "PowerPv1",
                     "realname": "Erzeugungsleistung Pv1",
-                    "openwbtopic": "setpv1w",
                     "datatype": "float",
                     "factor": 0.1,
                     "unit": "W"
@@ -130,7 +129,6 @@
                     ],
                     "name": "PowerPv2",
                     "realname": "Erzeugungsleistung Pv2",
-                    "openwbtopic": "setpv2w",
                     "datatype": "float",
                     "factor": 0.1,
                     "unit": "W"
@@ -325,6 +323,20 @@
                 },
                 {
                     "position": [
+                        113,
+                        114,
+                        115,
+                        116
+                    ],
+                    "name": "TotalEnergyGeneratedWh",
+                    "realname": "Erzeugte Energie Gesamt in Wh",
+                    "datatype": "integer",
+                    "openwbtopic": "setcounterwh",
+                    "factor": 100,
+                    "unit": "KWh"
+                },
+                {
+                    "position": [
                         117,
                         118,
                         119,
@@ -358,7 +370,6 @@
                     ],
                     "name": "TotalEnergyWhPv1",
                     "realname": "Erzeugte Energie Pv1 in Wh",
-                    "openwbtopic": "setpv1counterwh",
                     "datatype": "integer",
                     "factor": 100,
                     "unit": "Wh"
@@ -385,7 +396,6 @@
                     ],
                     "name": "TotalEnergyWhPv2",
                     "realname": "Erzeugte Energie Pv2 in Wh",
-                    "openwbtopic": "setpv2counterwh",
                     "datatype": "integer",
                     "factor": 100,
                     "unit": "Wh"
@@ -399,7 +409,6 @@
                     ],
                     "name": "TotalEnergyKwhPv2",
                     "realname": "Erzeugte Energie Pv2 in Kwh",
-                    "openwbtopic": "setpv2counterwh",
                     "datatype": "float",
                     "factor": 0.1,
                     "unit": "KWh"

@@ -204,7 +204,6 @@
                   ],
                   "name": "PowerPv1",
                   "realname": "Power PV 1",
-                  "openwbtopic": "setpv1w",
                   "datatype": "integer",
                   "unit": "W"
               },
@@ -215,7 +214,6 @@
                   ],
                   "name": "PowerPv2",
                   "realname": "Power PV 2",
-                  "openwbtopic": "setpv2w",
                   "datatype": "integer",
                   "unit": "W"
               },

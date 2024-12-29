@@ -69,7 +69,6 @@
           "position": [23, 24],
           "name": "PowerPv1",
           "realname": "Power PV 1",
-          "openwbtopic": "setpv1w",
           "datatype": "integer",
           "factor": 10,
           "unit": "W"
@@ -78,7 +77,6 @@
           "position": [25, 26],
           "name": "PowerPv2",
           "realname": "Power PV 2",
-          "openwbtopic": "setpv2w",
           "datatype": "integer",
           "factor": 10,
           "unit": "W"
