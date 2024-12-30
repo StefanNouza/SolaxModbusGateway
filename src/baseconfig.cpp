@@ -1,6 +1,6 @@
 #include "baseconfig.h"
 
-BaseConfig::BaseConfig() : debuglevel(0), serial_rx(3), serial_tx(1), useAuth(false) {  
+BaseConfig::BaseConfig() : debuglevel(2), serial_rx(3), serial_tx(1), useAuth(false) {  
   #ifdef ESP8266
     LittleFS.begin();
   #elif defined(ESP32)
@@ -37,16 +37,16 @@ void BaseConfig::LoadJsonConfig() {
         
         if (doc["data"]["mqttroot"])         { this->mqtt_root = doc["data"]["mqttroot"].as<String>();} else {this->mqtt_root = "solax";}
         if (doc["data"]["mqttserver"])       { this->mqtt_server = doc["data"]["mqttserver"].as<String>();} else {this->mqtt_server = "test.mosquitto.org";}
-        if (doc["data"]["mqttport"])         { this->mqtt_port = (int)(doc["data"]["mqttport"]);} else {this->mqtt_port = 1883;}
+        if (doc["data"]["mqttport"])         { this->mqtt_port = doc["data"]["mqttport"].as<uint16_t>();} else {this->mqtt_port = 1883;}
         if (doc["data"]["mqttuser"])         { this->mqtt_username = doc["data"]["mqttuser"].as<String>();} else {this->mqtt_username = "";}
         if (doc["data"]["mqttpass"])         { this->mqtt_password = doc["data"]["mqttpass"].as<String>();} else {this->mqtt_password = "";}
         if (doc["data"]["mqttbasepath"])     { this->mqtt_basepath = doc["data"]["mqttbasepath"].as<String>();} else {this->mqtt_basepath = "home/";}
         if (doc["data"]["UseRandomClientID"]){ if (strcmp(doc["data"]["UseRandomClientID"], "none")==0) { this->mqtt_UseRandomClientID=false;} else {this->mqtt_UseRandomClientID=true;}} else {this->mqtt_UseRandomClientID = true;}
         if (doc["data"]["SelectConnectivity"]){if (strcmp(doc["data"]["SelectConnectivity"], "wifi")==0) { this->useETH=false;} else {this->useETH=true;}} else {this->useETH = false;}
-        if (doc["data"]["debuglevel"])       { this->debuglevel = _max((int)(doc["data"]["debuglevel"]), 0);} else {this->debuglevel = 0; }
+        if (doc["data"]["debuglevel"])       { this->debuglevel = _max(doc["data"]["debuglevel"].as<uint8_t>(), 0);} else {this->debuglevel = 0; }
         if (doc["data"]["SelectLAN"])        { this->LANBoard = doc["data"]["SelectLAN"].as<String>();} else {this->LANBoard = "";}
-        if (doc["data"]["serial_rx"])        { this->serial_rx = (int)(doc["serial_rx"]); } else {this->serial_rx = 3;}
-        if (doc["data"]["serial_tx"])        { this->serial_tx = (int)(doc["serial_tx"]); } else {this->serial_tx = 1;}
+        if (doc["data"]["serial_rx"])        { this->serial_rx = doc["data"]["serial_rx"].as<uint8_t>(); } else {this->serial_rx = 3;}
+        if (doc["data"]["serial_tx"])        { this->serial_tx = doc["data"]["serial_tx"].as<uint8_t>(); } else {this->serial_tx = 1;}
         if (doc["data"]["sel_auth"])         { if (strcmp(doc["data"]["sel_auth"], "off")==0) { this->useAuth=false;} else {this->useAuth=true;}} else {this->useAuth = false;}
         if (doc["data"]["auth_user"])        { this->auth_user = doc["data"]["auth_user"].as<String>();} else {this->auth_user = "admin";}
         if (doc["data"]["auth_pass"])        { this->auth_pass = doc["data"]["auth_pass"].as<String>();} else {this->auth_pass = "password";}
@@ -69,7 +69,7 @@ void BaseConfig::LoadJsonConfig() {
     this->mqtt_basepath = "home/";
     this->mqtt_UseRandomClientID = true;
     this->useETH = false;
-    this->debuglevel = 0;
+    this->debuglevel = 2;
     this->LANBoard = "";
     
     loadDefaultConfig = false; //set back
@@ -89,7 +89,6 @@ const String BaseConfig::GetReleaseName() {
 void BaseConfig::GetInitData(AsyncResponseStream *response) {
   String ret;
   JsonDocument json;
-  json["data"].to<JsonObject>();
   json["data"]["mqttroot"]    = this->mqtt_root;
   json["data"]["mqttserver"]  = this->mqtt_server;
   json["data"]["mqttport"]    = this->mqtt_port;
@@ -115,7 +114,6 @@ void BaseConfig::GetInitData(AsyncResponseStream *response) {
     json["data"]["GpioPin_serial_tx"] = this->serial_tx;
   #endif
 
-  json["response"].to<JsonObject>();
   json["response"]["status"] = 1;
   json["response"]["text"] = "successful";
   serializeJson(json, ret);
