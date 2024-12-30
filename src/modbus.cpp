@@ -970,6 +970,7 @@ void modbus::GetLiveDataAsJson(AsyncResponseStream *response, String subaction) 
     response->print(s);
     count++;
   }
+  yield();
   //Lazgar
   for (uint16_t i=0; i < this->InverterIdData->size(); i++) {
     if (subaction == "onlyactive" && !this->InverterIdData->at(i).active)  continue;
