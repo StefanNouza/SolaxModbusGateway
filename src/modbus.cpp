@@ -337,7 +337,7 @@ void modbus::QueryIdData() {
       Config->log(4, this->PrintDataFrame(&this->Conf_RequestIdData->at(i)).c_str());
       this->ReadQueue->enqueue(this->Conf_RequestIdData->at(i));
     }
-    this->LastTxIdData = millis();
+    this->LastTxIdData = millis(); //erst setzen wenn erfolgreich in die Queue geschickt wurde
   }
 }
 
@@ -364,7 +364,7 @@ void modbus::QueryLiveData() {
       Config->log(4, this->PrintDataFrame(&this->Conf_RequestLiveData->at(i)).c_str());
       this->ReadQueue->enqueue(this->Conf_RequestLiveData->at(i));
     }
-    this->LastTxLiveData = millis();
+    this->LastTxLiveData = millis(); //erst setzen wenn erfolgreich in die Queue geschickt wurde
   }
 }
 
@@ -422,7 +422,7 @@ void modbus::QueryQueueToInverter() {
 
     if (rwtype == WRITE) {
       this->ReceiveSetData(&m);
-      this->LastTxIdData = millis() - (this->TxIntervalIdData * 1001); //Setze den Timer zurück um nach einem Set Befehl die ID Daten abzufragen Zeitnah die rückmeldung ob der Set Befehl ausgefürt wurde
+      this->LastTxIdData = millis() - (this->TxIntervalIdData * 1001); //Setze den Timer zurück um nach einem Set Befehl die ID Daten abzufragen zwecks Rückmeldung ob der Set Befehl ausgeführt wurde
     } 
     else if (rwtype == READ) { 
       this->ReceiveReadData();
