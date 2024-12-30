@@ -337,6 +337,7 @@ void modbus::QueryIdData() {
       Config->log(4, this->PrintDataFrame(&this->Conf_RequestIdData->at(i)).c_str());
       this->ReadQueue->enqueue(this->Conf_RequestIdData->at(i));
     }
+    this->LastTxIdData = millis();
   }
 }
 
@@ -363,6 +364,7 @@ void modbus::QueryLiveData() {
       Config->log(4, this->PrintDataFrame(&this->Conf_RequestLiveData->at(i)).c_str());
       this->ReadQueue->enqueue(this->Conf_RequestLiveData->at(i));
     }
+    this->LastTxLiveData = millis();
   }
 }
 
@@ -1105,14 +1107,14 @@ void modbus::SetItemActiveStatus(String item, bool newstate) {
 void modbus::loop() {
   // handle requesting ID Data into queue
   if (millis() - this->LastTxIdData > this->TxIntervalIdData * 1000) {
-    this->LastTxIdData = millis();
+    
     
     if (this->InverterType.filename.length() > 1) {this->QueryIdData();}
   }
 
   // handle requesting LiveData into queue
   if (millis() - this->LastTxLiveData > this->TxIntervalLiveData * 1000) {
-    this->LastTxLiveData = millis();
+    
     
     if (this->InverterType.filename.length() > 1) {
       this->QueryLiveData();
