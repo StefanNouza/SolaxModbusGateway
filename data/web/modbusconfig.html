@@ -66,16 +66,15 @@
         </tr>
 
         <tr>
-          <td colspan='2'>
-          <div class='inline'>
-            <input type='radio' id='EnableRelays_On' name='EnableRelays' value='1' onclick="radioselection(['EnableRelays_1','EnableRelays_2'],[])"/>
-            <label for='EnableRelays_On'>enable reading inverter relay</label>
-          </div>
-          
-          <div class='inline'>
-            <input type='radio' id='EnableRelays_Off' name='EnableRelays' value='0' onclick="radioselection([],['EnableRelays_1','EnableRelays_2'])"/>
-            <label for='EnableRelays_Off'>disable reading inverter relay</label>
-          </div>  
+          <td>Enable reading inverter relay</td>
+          <td>
+            <div class='onoffswitch'>
+              <input type='checkbox' name='enableRelays' class='onoffswitch-checkbox' id='enableRelays' onclick="onCheckboxSelection(this,['EnableRelays_1','EnableRelays_2'], [])">
+              <label class='onoffswitch-label' for='enableRelays'>
+                <span class='onoffswitch-inner'></span>
+                <span class='onoffswitch-switch'></span>
+              </label>
+            </div>
           </td>
         </tr>
 
@@ -90,16 +89,15 @@
         </tr>
 
         <tr>
-          <td colspan='2'>
-          <div class='inline'>
-            <input type='radio' id='EnableOpenWb_On' name='EnableOpenWb' value='1' onclick="radioselection(['EnableOpenWb_1','EnableOpenWb_2','EnableOpenWb_3'],[])"/>
-            <label for='EnableOpenWb_On'>enable OpenWB Support</label>
-          </div>
-          
-          <div class='inline'>
-            <input type='radio' id='EnableOpenWb_Off' name='EnableOpenWb' value='0' onclick="radioselection([],['EnableOpenWb_1','EnableOpenWb_2','EnableOpenWb_3'])"/>
-            <label for='EnableOpenWb_Off'>disable OpenWB Support</label>
-          </div>  
+          <td>Enable OpenWB support</td>
+          <td>
+            <div class='onoffswitch'>
+              <input type='checkbox' name='enableOpenWb' class='onoffswitch-checkbox' id='enableOpenWb' onclick="onCheckboxSelection(this,['EnableOpenWb_1','EnableOpenWb_2','EnableOpenWb_3'], [])">
+              <label class='onoffswitch-label' for='enableOpenWb'>
+                <span class='onoffswitch-inner'></span>
+                <span class='onoffswitch-switch'></span>
+              </label>
+            </div>
           </td>
         </tr>
 

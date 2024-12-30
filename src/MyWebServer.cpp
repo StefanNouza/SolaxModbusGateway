@@ -28,11 +28,11 @@ MyWebServer::MyWebServer(AsyncWebServer *server, DNSServer* dns): DoReboot(false
   //ElegantOTA.onEnd(std::bind(&MyWebServer::onOTAEnd, this, std::placeholders::_1));
 
   if (Config->GetUseAuth()) {
-    server->serveStatic("/", LittleFS, "/", "max-age=3600")
+    server->serveStatic("/", LittleFS, "/", String("max-age="+Config->GetCacheTime()).c_str())
           .setDefaultFile("/web/index.html")
           .setAuthentication(Config->GetAuthUser().c_str(), Config->GetAuthPass().c_str());
   } else {
-    server->serveStatic("/", LittleFS, "/", "max-age=3600")
+    server->serveStatic("/", LittleFS, "/", String("max-age="+Config->GetCacheTime()).c_str())
           .setDefaultFile("/web/index.html");
   }
   

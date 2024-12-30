@@ -35,6 +35,7 @@ class BaseConfig {
     const bool&     GetUseAuth()        const { return useAuth; }
     const String&   GetAuthUser()      const {return auth_user;}
     const String&   GetAuthPass()      const {return auth_pass;}
+    const uint16_t& GetCacheTime()     const {return cachetime;}
 
     const String    GetReleaseName(); 
   private:
@@ -50,6 +51,7 @@ class BaseConfig {
     uint8_t   debuglevel;
     uint8_t   serial_rx;
     uint8_t   serial_tx;
+    uint16_t  cachetime;
     bool      useAuth;
     String    auth_user;
     String    auth_pass;

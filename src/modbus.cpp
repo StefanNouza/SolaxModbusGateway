@@ -1229,11 +1229,11 @@ void modbus::LoadJsonConfig(bool firstrun) {
         if (doc["data"]["openwbmodulid"])    { this->Conf_OpenWBModulID = doc["data"]["openwbmodulid"].as<uint8_t>(); this->OpenWB->addMapping("InverterID", String(this->Conf_OpenWBModulID)); }
         if (doc["data"]["openwbbatteryid"])  { this->Conf_OpenWBBatteryID = doc["data"]["openwbbatteryid"].as<uint8_t>(); this->OpenWB->addMapping("BatteryID", String(this->Conf_OpenWBBatteryID)); }
 
-        this->Conf_EnableOpenWB       = (bool)doc["data"]["EnableOpenWb"].as<int>();
+        this->Conf_EnableOpenWB       = doc["data"]["enableOpenWb"].as<bool>();
         this->Conf_EnableSetters      = doc["data"]["enable_setters"].as<bool>();
         this->enableCrcCheck          = doc["data"]["enableCrcCheck"].as<bool>();
         this->enableLengthCheck       = doc["data"]["enableLengthCheck"].as<bool>();
-        this->enableRelays            = (bool)(doc["data"]["EnableRelays"]).as<int>();
+        this->enableRelays            = doc["data"]["enableRelays"].as<bool>();
         
         if (doc["data"]["invertertype"])     { 
           bool found = false;
@@ -1383,11 +1383,9 @@ void modbus::GetInitData(AsyncResponseStream *response) {
   json["data"]["txintervalid"]        = this->TxIntervalIdData;
   json["data"]["GpioPin_Relay1"]      = this->pin_Relay1;
   json["data"]["GpioPin_Relay2"]      = this->pin_Relay2;
-  json["data"]["EnableRelays_On"]     = ((this->enableRelays)?1:0);
-  json["data"]["EnableRelays_Off"]    = ((this->enableRelays)?0:1);
-
-  json["data"]["EnableOpenWb_On"]     = ((this->Conf_EnableOpenWB)?1:0);
-  json["data"]["EnableOpenWb_Off"]    = ((this->Conf_EnableOpenWB)?0:1);
+  
+  json["data"]["enableRelays"]        = ((this->enableRelays)?1:0);
+  json["data"]["enableOpenWb"]        = ((this->Conf_EnableOpenWB)?1:0);
   json["data"]["openwbmodulid"]       = this->Conf_OpenWBModulID;
   json["data"]["openwbbatteryid"]     = this->Conf_OpenWBBatteryID;
 
