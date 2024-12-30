@@ -1,10 +1,6 @@
 #include "baseconfig.h"
 
-BaseConfig::BaseConfig(): debuglevel(2), 
-                          serial_rx(3), 
-                          serial_tx(1),
-                          cachetime(3600),
-                          useAuth(false) {  
+BaseConfig::BaseConfig() : debuglevel(2), serial_rx(3), serial_tx(1), useAuth(false) {  
   #ifdef ESP8266
     LittleFS.begin();
   #elif defined(ESP32)
@@ -54,7 +50,6 @@ void BaseConfig::LoadJsonConfig() {
         if (doc["data"]["sel_auth"])         { if (strcmp(doc["data"]["sel_auth"], "off")==0) { this->useAuth=false;} else {this->useAuth=true;}} else {this->useAuth = false;}
         if (doc["data"]["auth_user"])        { this->auth_user = doc["data"]["auth_user"].as<String>();} else {this->auth_user = "admin";}
         if (doc["data"]["auth_pass"])        { this->auth_pass = doc["data"]["auth_pass"].as<String>();} else {this->auth_pass = "password";}
-        if (doc["data"]["cachetime"])        { this->cachetime = doc["data"]["cachetime"].as<uint16_t>();} else {this->cachetime = 3600;}
       } else {
         this->log(1, "failed to load json config, load default config");
         loadDefaultConfig = true;
@@ -109,7 +104,6 @@ void BaseConfig::GetInitData(AsyncResponseStream *response) {
   json["data"]["sel_auth_on"] = ((this->useAuth)?1:0);
   json["data"]["auth_user"]   = this->auth_user;
   json["data"]["auth_pass"]   = this->auth_pass;
-  json["data"]["cachetime"]   = this->cachetime;
 
 
   #ifdef USE_WEBSERIAL

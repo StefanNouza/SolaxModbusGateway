@@ -71,13 +71,6 @@ function handleRadioSelections() {
   for( var i=0; i< objects.length; i++) {
     objects[i].click();
   }
-
-  var checkboxes = document.querySelectorAll('input[type=checkbox][onclick]');
-  for (var i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i].onclick) {
-      checkboxes[i].dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
-    }
-  }
 }
 
 /*############################################################
@@ -392,16 +385,3 @@ function radioselection(show, hide) {
   }
 }
 
-/*******************************
- * 
- * @param {*} checkbox object of the checkbox
- * @param {*} show Array of shown IDs if checkbox is checked
- * @param {*} hide Array of hidden IDs if checkbox is checked
- */
-function onCheckboxSelection(checkbox, show, hide) {
-  if (checkbox.checked) {
-    radioselection(show, hide);
-  } else {
-    radioselection(hide, show);
-  }
-}

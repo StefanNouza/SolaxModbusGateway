@@ -1,8 +1,6 @@
 Release 3.3.1:
-  - BugFix: fix null-termination of string handling (#96)
+  - BugFix: fix null-terminationof string handling (#96)
   - new feature: support for OpenWB 2.0 Api (#100)
-  - new Advanced feature: setting up Browser cache-time of WebUI
-  - new feature: ability to setup fix WiFi credentials if web-installer doesn´t support the ESP-Board
 
 Release 3.3.0:
   - new feature: WebSerial as remote serial output (#74)
