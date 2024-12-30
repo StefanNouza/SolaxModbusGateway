@@ -337,6 +337,7 @@ void modbus::QueryIdData() {
       Config->log(4, this->PrintDataFrame(&this->Conf_RequestIdData->at(i)).c_str());
       this->ReadQueue->enqueue(this->Conf_RequestIdData->at(i));
     }
+    this->LastTxIdData = millis(); //erst setzen wenn erfolgreich in die Queue geschickt wurde
   }
 }
 
@@ -363,6 +364,7 @@ void modbus::QueryLiveData() {
       Config->log(4, this->PrintDataFrame(&this->Conf_RequestLiveData->at(i)).c_str());
       this->ReadQueue->enqueue(this->Conf_RequestLiveData->at(i));
     }
+    this->LastTxLiveData = millis(); //erst setzen wenn erfolgreich in die Queue geschickt wurde
   }
 }
 
@@ -420,6 +422,7 @@ void modbus::QueryQueueToInverter() {
 
     if (rwtype == WRITE) {
       this->ReceiveSetData(&m);
+      this->LastTxIdData = millis() - (this->TxIntervalIdData * 1001); //Setze den Timer zurück um nach einem Set Befehl die ID Daten abzufragen zwecks Rückmeldung ob der Set Befehl ausgeführt wurde
     } 
     else if (rwtype == READ) { 
       this->ReceiveReadData();
@@ -459,7 +462,6 @@ bool modbus::ReceiveSetData(std::vector<byte>* SendHexFrame) {
       //ret = true;
     //}
   }
-
   return ret;
 }
 
@@ -1101,14 +1103,14 @@ void modbus::SetItemActiveStatus(String item, bool newstate) {
 void modbus::loop() {
   // handle requesting ID Data into queue
   if (millis() - this->LastTxIdData > this->TxIntervalIdData * 1000) {
-    this->LastTxIdData = millis();
+    
     
     if (this->InverterType.filename.length() > 1) {this->QueryIdData();}
   }
 
   // handle requesting LiveData into queue
   if (millis() - this->LastTxLiveData > this->TxIntervalLiveData * 1000) {
-    this->LastTxLiveData = millis();
+    
     
     if (this->InverterType.filename.length() > 1) {
       this->QueryLiveData();
