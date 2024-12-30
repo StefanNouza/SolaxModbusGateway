@@ -281,7 +281,6 @@
           ],
           "name": "PowerPv1",
           "realname": "Erzeugungsleistung Pv1",
-          "openwbtopic": "setpv1w",
           "datatype": "float",
           "unit": "W"
         },
@@ -292,7 +291,6 @@
           ],
           "name": "PowerPv2",
           "realname": "Erzeugungsleistung Pv2",
-          "openwbtopic": "setpv2w",
           "datatype": "float",
           "unit": "W"
         },

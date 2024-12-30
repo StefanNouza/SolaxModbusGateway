@@ -9,7 +9,7 @@ BaseConfig::BaseConfig() : debuglevel(0), serial_rx(3), serial_tx(1), useAuth(fa
         LittleFS.mkdir("/config");
       }
     } else {
-      dbg.println("LittleFS Mount Failed");
+      this->log(1, "LittleFS Mount Failed");
     }
   #endif
   
@@ -24,10 +24,10 @@ void BaseConfig::LoadJsonConfig() {
   bool loadDefaultConfig = false;
   if (LittleFS.exists("/config/baseconfig.json")) {
     //file exists, reading and loading
-    dbg.println("reading config file");
+    this->log(2, "reading config file");
     File configFile = LittleFS.open("/config/baseconfig.json", "r");
     if (configFile) {
-      dbg.println("opened config file");
+      this->log(2, "opened config file");
       
       JsonDocument doc;
       DeserializationError error = deserializeJson(doc, configFile);
@@ -45,19 +45,18 @@ void BaseConfig::LoadJsonConfig() {
         if (doc["data"]["SelectConnectivity"]){if (strcmp(doc["data"]["SelectConnectivity"], "wifi")==0) { this->useETH=false;} else {this->useETH=true;}} else {this->useETH = false;}
         if (doc["data"]["debuglevel"])       { this->debuglevel = _max((int)(doc["data"]["debuglevel"]), 0);} else {this->debuglevel = 0; }
         if (doc["data"]["SelectLAN"])        { this->LANBoard = doc["data"]["SelectLAN"].as<String>();} else {this->LANBoard = "";}
-        if (doc["data"]["serial_rx"])        { this->serial_rx = (doc["serial_rx"].as<int>());}
-        if (doc["data"]["serial_tx"])        { this->serial_tx = (doc["serial_tx"].as<int>());}
+        if (doc["data"]["serial_rx"])        { this->serial_rx = (int)(doc["serial_rx"]); } else {this->serial_rx = 3;}
+        if (doc["data"]["serial_tx"])        { this->serial_tx = (int)(doc["serial_tx"]); } else {this->serial_tx = 1;}
         if (doc["data"]["sel_auth"])         { if (strcmp(doc["data"]["sel_auth"], "off")==0) { this->useAuth=false;} else {this->useAuth=true;}} else {this->useAuth = false;}
         if (doc["data"]["auth_user"])        { this->auth_user = doc["data"]["auth_user"].as<String>();} else {this->auth_user = "admin";}
         if (doc["data"]["auth_pass"])        { this->auth_pass = doc["data"]["auth_pass"].as<String>();} else {this->auth_pass = "password";}
-        
       } else {
-        if (this->GetDebugLevel() >=1) {dbg.println("failed to load json config, load default config");}
+        this->log(1, "failed to load json config, load default config");
         loadDefaultConfig = true;
       }
     }
   } else {
-    if (this->GetDebugLevel() >=3) {dbg.println("baseconfig.json config File not exists, load default config");}
+    this->log(3, "baseconfig.json config File not exists, load default config");
     loadDefaultConfig = true;
   }
 

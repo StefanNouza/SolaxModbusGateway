@@ -2,25 +2,18 @@
     {
         "version": "1.9",
         "topics": [
-            { "setpvw": "openWB/set/pv/W" },
-            { "setpv1w": "openWB/set/pv/1/W"},
-            { "setpv2w": "openWB/set/pv/2/W" },
+            { "setpvw": "openWB/set/pv/#InverterID#/W" },
             { "setbatw": "openWB/set/houseBattery/W"},
             { "setbatsoc": "openWB/set/houseBattery/%Soc"},
             { "setbatexpwh": "openWB/set/houseBattery/WhExported"},
             { "setbatimpwh": "openWB/set/houseBattery/WhImported"},
-            { "setcounterwh": "openWB/set/pv/WhCounter"},
-            { "setpv1counterwh": "openWB/set/pv/1/WhCounter"},
-            { "setpv2counterwh": "openWB/set/pv/2/WhCounter"}
-
+            { "setcounterwh": "openWB/set/pv/#InverterID#/WhCounter"}
         ] 
     },
     {
         "version": "2.0",
         "topics": [
             { "setpvw": "openWB/set/pv/#InverterID#/get/power" },
-            { "setpv1w": ""},
-            { "setpv2w": "" },
             { "setbatw": "openWB/set/bat/#BatteryID#/get/power"},
             { "setbatsoc": "openWB/set/bat/#BatteryID#/get/soc"},
             { "setbatexpwh": "openWB/set/bat/#BatteryID#/get/exported"},

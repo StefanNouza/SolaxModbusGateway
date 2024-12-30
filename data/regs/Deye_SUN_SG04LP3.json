@@ -327,6 +327,20 @@
                 },
                 {
                     "position": [
+                        73,
+                        74,
+                        71,
+                        72
+                    ],
+                    "name": "TotalPVPowerWh",
+                    "realname": "Total PV Power in Wh",
+                    "datatype": "float",
+                    "factor": 100,
+                    "openwbtopic": "setcounterwh",
+                    "unit": "KWh"
+                },
+                {
+                    "position": [
                         81,
                         82
                     ],

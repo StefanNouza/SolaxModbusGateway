@@ -3,7 +3,15 @@
 /*******************************************************
  * Constructor
 *******************************************************/
-modbus::modbus() : enableRelays(false), Baudrate(19200), enableCrcCheck(true), enableLengthCheck(true), LastTxLiveData(0), LastTxIdData(0), LastTxInverter(0) {
+modbus::modbus(): enableRelays(false), 
+                  Baudrate(19200), 
+                  enableCrcCheck(true), 
+                  enableLengthCheck(true), 
+                  LastTxLiveData(0), 
+                  LastTxIdData(0), 
+                  LastTxInverter(0),
+                  Conf_OpenWBModulID(1),
+                  Conf_OpenWBBatteryID(2) {
   DataFrame           = new std::vector<byte>{};
   SaveIdDataframe     = new std::vector<byte>{};
   SaveLiveDataframe   = new std::vector<byte>{};
@@ -950,7 +958,7 @@ void modbus::GetLiveDataAsJson(AsyncResponseStream *response, String subaction) 
     doc["active"]["name"] = this->InverterLiveData->at(i).Name.c_str();
     doc["mqtttopic"]  = std::move(this->mqtt->getTopic(this->InverterLiveData->at(i).Name, false));
     
-    if (this->InverterLiveData->at(i).openwb.length() > 0) {
+    if (this->Conf_EnableOpenWB && this->InverterLiveData->at(i).openwb.length() > 0) {
       JsonArray wb = doc["openwb"].to<JsonArray>();
       wb[0]["openwbtopic"]  = std::move(OpenWB->getOpenWbTopic(this->InverterLiveData->at(i).openwb));
     }
@@ -1095,6 +1103,14 @@ void modbus::SetItemActiveStatus(String item, bool newstate) {
  * loop function
 *******************************************************/
 void modbus::loop() {
+  // handle requesting ID Data into queue
+  if (millis() - this->LastTxIdData > this->TxIntervalIdData * 1000) {
+    this->LastTxIdData = millis();
+    
+    if (this->InverterType.filename.length() > 1) {this->QueryIdData();}
+  }
+
+  // handle requesting LiveData into queue
   if (millis() - this->LastTxLiveData > this->TxIntervalLiveData * 1000) {
     this->LastTxLiveData = millis();
     
@@ -1104,13 +1120,7 @@ void modbus::loop() {
     }  
    }
 
-  if (millis() - this->LastTxIdData > this->TxIntervalIdData * 1000) {
-    this->LastTxIdData = millis();
-    
-    if (this->InverterType.filename.length() > 1) {this->QueryIdData();}
-  }
-
-  //its allowed to send a new request every 800ms, we use recommend 1000ms
+  //its allowed to send a new request every 800ms, we use recommended 1000ms
   if (millis() - this->LastTxInverter > 1000) {
     this->LastTxInverter = millis();
 
