@@ -420,6 +420,7 @@ void modbus::QueryQueueToInverter() {
 
     if (rwtype == WRITE) {
       this->ReceiveSetData(&m);
+      this->LastTxIdData = millis() - this->TxIntervalIdData * 1000; //Setze den Timer zurück um nach einem Set Befehl die ID Daten abzufragen (Zeitnah die rückmeldung ob der Set Befehl ausgefürt wurde)
     } 
     else if (rwtype == READ) { 
       this->ReceiveReadData();
