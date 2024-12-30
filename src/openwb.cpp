@@ -29,14 +29,14 @@ void openwb::LoadAvailableOpenWbVersions() {
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, file);
   if (error) {
-    Config->log(1, "Failed to parse /misc/openwb.json: %s\n", error.c_str());
+    Config->log(1, "Failed to parse /misc/openwb.json: %s", error.c_str());
     file.close();
     return;
   }
 
   for (JsonObject v : doc.as<JsonArray>()) {
     OpenWBVersions->push_back(v["version"].as<String>());
-    Config->log(3, "OpenWB Version found: %s\n", v["version"].as<String>().c_str());
+    Config->log(3, "OpenWB Version found: %s", v["version"].as<String>().c_str());
   }
 
   file.close();
@@ -53,7 +53,7 @@ void openwb::LoadOpenWBTopicsFromJson() {
   DeserializationError error = deserializeJson(doc, file);
 
   if (error) {
-    Config->log(1, "Failed to parse /misc/openwb.json: %s\n", error.c_str());
+    Config->log(1, "Failed to parse /misc/openwb.json: %s", error.c_str());
     file.close();
     return;
   }
@@ -69,7 +69,7 @@ void openwb::LoadOpenWBTopicsFromJson() {
           t.value = kv.value().as<String>();
           this->OpenWBTopics->push_back(t);
 
-          Config->log(3, "openWB topic loaded: %s\n", kv.value().as<String>().c_str());
+          Config->log(3, "openWB topic loaded: %s", kv.value().as<String>().c_str());
           
         }
       }
