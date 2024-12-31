@@ -68,6 +68,20 @@
                     "unit": "Hz"
                 },
                 {
+                    "position": [
+                    185,
+                    186,
+                    187,
+                    188
+                    ],
+                    "name": "TotalEnergyPV",
+                    "realname": "Erzeugte Energie PV",
+                    "openwbtopic": "setcounterwh",
+                    "datatype": "integer",
+                    "factor": 100,
+                    "unit": "Wh"
+                },
+                {
                     "position": [125, 126, 127, 128],
                     "name": "TotalEnergyWhPv1",
                     "realname": "Erzeugte Energie Pv1 in Wh",
