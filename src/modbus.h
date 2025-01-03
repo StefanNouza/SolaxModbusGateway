@@ -13,7 +13,7 @@
 #include <sstream>
 #include <openwb.h>
 
-#define DEBUGMODE
+//#define DEBUGMODE
 
 class modbus {
 
@@ -57,7 +57,8 @@ class modbus {
     void                    GetInitData(AsyncResponseStream *response);
     void                    GetInitRawData(AsyncResponseStream *response);
     String                  GetInverterSN();
-    void                    GetLiveDataAsJson(AsyncResponseStream *response, String action);
+
+    void                    GetLiveDataAsJson(AsyncWebServerRequest *request);
     void                    GetRegisterAsJson(AsyncResponseStream *response);
     void                    SetItemActiveStatus(String item, bool newstate);
     void                    ReceiveMQTT(String topic, int msg);

@@ -1,8 +1,21 @@
-/*############################################################
-#
-# definition of constants
-#
-############################################################*/
+/*****************************************************************************************
+ * @file /data/web/Javascript.js
+ * @description This file contains various JavaScript functions and constants used for handling GPIO configurations, 
+ *              data fetching, applying JSON data to HTML templates, creating selection lists from input fields, 
+ *              and transforming checkboxes into styled on/off switches. The functions are designed to work with 
+ *              a web interface for managing and configuring GPIO ports and other related settings.
+ * @version 1.0.0
+ * @date 2023-10-01
+ * 
+ * @author Tobias.Faust
+ * 
+ * @license MIT
+ * 
+ *****************************************************************************************/
+
+/*****************************************************************************************
+ * Definition of constants
+ *****************************************************************************************/
 
 const gpio_disabled = [];
 
@@ -60,24 +73,42 @@ const gpioanalog = [  {port: 36, name:'ADC1_CH0 - GPIO36'},
 
 var timer; // ID of setTimout Timer -> setResponse
 
-/*############################################################
-#
-
-# activate all radioselections after pageload to hide unnecessary elements
-#
-############################################################*/
+/******************************************************************************************
+ * activate all radioselections after pageload to hide unnecessary elements
+ * Works for all checkbox and radio elements with onclick="radioselection(show, hide)"
+ * 
+ ******************************************************************************************/
 function handleRadioSelections() {
-  var objects = document.querySelectorAll('input[type=radio][onclick*=radioselection]:checked');
-  for( var i=0; i< objects.length; i++) {
-    objects[i].click();
+  var radios = document.querySelectorAll('input[type=radio][onclick*=radioselection]:checked');
+  for (var i = 0; i < radios.length; i++) {
+    if (radios[i].onclick) {
+      var onclickStr = radios[i].getAttribute('onclick');
+      var match = onclickStr.match(/radioselection\((.*)\)/);
+      if (match) {
+        eval("radioselection(" + match[1] + ")");
+      }
+    }
+  }
+
+  var checkboxes = document.querySelectorAll('input[type=checkbox][onclick*=onCheckboxSelection]');
+  for (var i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].onclick) {
+      var onclickStr = checkboxes[i].getAttribute('onclick');
+      var match = onclickStr.match(/onCheckboxSelection\((.*)\)/);
+      if (match) {
+        eval("onCheckboxSelection(" + match[1] + ")");
+      }
+    }
   }
 }
 
-/*############################################################
-#
-# central function to initiate data fetch
-#
-############################################################*/
+/*****************************************************************************************
+ * central function to initiate data fetch
+ * @param {*} json -> json object to send
+ * @param {*} highlight -> highlight on/off
+ * @param {*} callbackFn -> callback function to call after data is fetched
+ * @returns {*} void
+******************************************************************************************/
 
 function requestData(json, highlight, callbackFn) {
   const data = new URLSearchParams();
@@ -92,11 +123,18 @@ function requestData(json, highlight, callbackFn) {
   .then (json =>  { handleJsonItems(json, highlight, callbackFn)}); 
 }
 
-/*############################################################
-#
-# definition of applying jsondata to html templates
-#
-############################################################*/
+/*****************************************************************************************
+ *
+ * definition of applying jsondata to html templates
+ * @param {*} _obj -> object to apply key
+ * @param {*} _key -> key to apply
+ * @param {*} _val -> value to apply
+ * @param {*} counter -> counter of array
+ * @param {*} tplHierarchie -> hierarchie of template
+ * @param {*} highlight -> highlight on/off
+ * @returns {*} void
+ *
+******************************************************************************************/
 function applyKey (_obj, _key, _val, counter, tplHierarchie, highlight) {
   if (_obj.id == _key || _obj.id == tplHierarchie +"."+ _key) {
 	  if (['SPAN', 'DIV', 'TD', 'DFN'].includes(_obj.tagName)) {
@@ -122,14 +160,15 @@ function applyKey (_obj, _key, _val, counter, tplHierarchie, highlight) {
   }
 }
 
-/*############################################################################
-json	-> der json teil der angewendet werden soll
-_tpl	-> das documentFragment auf welches das json agewendet werden soll
-ObjID -> ggf eine ID im _tpl auf die "key" und "value" des jsons agewendet werden soll
-					wenn diese undefinied ist, ist die ID = json[key]
-counter -> gesetzt, wenn innerhalb eines _tpl arrays die ID des Objektes hochgezählt wurde           
-highlight -> wenn in einem objekt die klasse "ajaxchange" gesetzt ist, so wird die Klasse "highlightOn" angewendet
-#############################################################################*/
+/*****************************************************************************************
+ * Apply a set of keys from an Array or an Object
+ * @param {*}  json	-> der json teil der angewendet werden soll
+ * @param {*}  _tpl	-> das documentFragment auf welches das json agewendet werden soll
+ * @param {*}  ObjID -> ggf eine ID im _tpl auf die "key" und "value" des jsons agewendet werden soll
+ *					wenn diese undefinied ist, ist die ID = json[key]
+ * @param {*}  counter -> gesetzt, wenn innerhalb eines _tpl arrays die ID des Objektes hochgezählt wurde           
+ * @param {*}  highlight -> wenn in einem objekt die klasse "ajaxchange" gesetzt ist, so wird die Klasse "highlightOn" angewendet
+*****************************************************************************************/
 
 function applyKeys(json, _tpl, ObjID, counter, tplHierarchie, highlight) {
   for (var key in json) {
@@ -168,6 +207,15 @@ function applyKeys(json, _tpl, ObjID, counter, tplHierarchie, highlight) {
   }
 }
 
+/*****************************************************************************************
+ * apply template to document
+ * @param {*} TemplateJson: json object to apply
+ * @param {*} templateID: id of template to apply
+ * @param {*} doc: document to apply
+ * @param {*} tplHierarchie: hierarchie of template
+ * @param {*} highlight: highlight on/off
+ * @returns {*} void
+*****************************************************************************************/
 function applyTemplate(TemplateJson, templateID, doc, tplHierarchie, highlight) {
   if (Array.isArray(TemplateJson)) {
     for (var i=0; i < TemplateJson.length; i++) {
@@ -220,15 +268,14 @@ function handleJsonItems(json, highlight, callbackFn) {
   }
 
 	// DOM objects now ready
-  handleRadioSelections();
-	if (callbackFn) {callbackFn();}
+  if (callbackFn) {callbackFn();}
 }
 
-// ***********************************
-// show response
-// b => bool => true = OK; false = Error
-// s => String => text to show
-// ***********************************
+/*****************************************************************************************
+ * show response
+ * @param {*} b (bool):  true = OK; false = Error
+ * @param {*} s (String): text to show
+*****************************************************************************************/
 function setResponse(b, s) {
   try {
   	// clear if previous timer still run
@@ -246,7 +293,7 @@ function setResponse(b, s) {
   } catch(e) {}
 }
 
-/*############################################################
+/******************************************************************************************
 #
 # definition of creating selectionlists from input fields
 # querySelector -> select input fields to convert
@@ -256,7 +303,7 @@ function setResponse(b, s) {
 # example: 
 # CreateSelectionListFromInputField('input[type=number][id^=AllePorts], input[type=number][id^=GpioPin]', 
 #                                    [gpio, gpio_analog], gpio_disabled);
-############################################################*/
+******************************************************************************************/
 function CreateSelectionListFromInputField(querySelector, jsonLists, blacklist) {
 	var _parent, _select, _option, i, j, k;
   var objects = document.querySelectorAll(querySelector);
@@ -282,9 +329,9 @@ function CreateSelectionListFromInputField(querySelector, jsonLists, blacklist) 
   }
 }
 
-/*############################################################
-# returns, if a element is visible or not
-############################################################*/
+/*****************************************************************************************
+ * returns, if a element is visible or not
+****************************************************************************************/
 function isVisible(_obj) {
 	var ret = true;
 	if (_obj && _obj.style.display == "none") { ret = false;}
@@ -292,12 +339,12 @@ function isVisible(_obj) {
   return ret;
 }
 
-/*******************************
+/****************************************************************************************
 separator: 
 regex of item ID to identify first element in row
   - if set, returned json is an array, all elements per row, example: "^myonoffswitch.*"
   - if emty, all elements at one level together, ONLY for small json´s (->memory issue)
-*******************************/
+****************************************************************************************/
 function onSubmit(DataForm, separator='') {
   // init json Objects
   var JsonData, tempData; 
@@ -371,11 +418,11 @@ function onSubmit(DataForm, separator='') {
 }
 
 
-/*******************************
+/****************************************************************************************
 blendet Zeilen der Tabelle aus
   show: Array of shown IDs return true;
   hide: Array of hidden IDs 
-*******************************/
+****************************************************************************************/
 function radioselection(show, hide) {
   for(var i = 0; i < show.length; i++){
     if (document.getElementById(show[i])) {document.getElementById(show[i]).style.display = 'table-row';}
@@ -385,3 +432,66 @@ function radioselection(show, hide) {
   }
 }
 
+/****************************************************************************************
+ * Show elements on checkbox is set, otherwise hide elements
+ * @param {*} checkbox object of the checkbox
+ * @param {*} show Array of shown IDs if checkbox is checked
+ * @param {*} hide Array of hidden IDs if checkbox is checked
+ * @returns {*} void
+ ****************************************************************************************/
+function onCheckboxSelection(checkbox, show, hide) {
+  if (checkbox.checked) {
+    radioselection(show, hide);
+  } else {
+    radioselection(hide, show);
+  }
+}
+
+/****************************************************************************************
+ * Transforms all checkboxes in the document that are not within a div with the style class "onoffswitch".
+ * 
+ * This function searches for all input elements of type checkbox that do not have the class "onoffswitch-checkbox".
+ * For each of these checkboxes, it creates a new div element with the class "onoffswitch", clones the checkbox into this div,
+ * and adds a label with the necessary span elements for styling. Finally, it replaces the original checkbox with the new div element.
+ ****************************************************************************************/
+function transformCheckboxes() {
+  // Alle Checkboxen im Dokument suchen deren elternelement kein div mit der Style class "onoffswitch" ist
+  const checkboxes = document.querySelectorAll("input[type='checkbox']:not(.onoffswitch-checkbox)");
+
+  for (var i = 0; i < checkboxes.length; i++) {
+    // Eltern-Element der Checkbox
+    const parent = checkboxes[i].parentElement;
+    
+    // Neues Div-Element erstellen
+    const div = document.createElement('div');
+    div.className = 'onoffswitch';
+
+    // Checkbox in das neue Div-Element kopieren
+    const newCheckbox = checkboxes[i].cloneNode(true)
+    newCheckbox.className = 'onoffswitch-checkbox';
+    div.appendChild(newCheckbox);
+     
+    // Neues Label-Element erstellen
+    const label = document.createElement('label');
+    label.className = 'onoffswitch-label';
+    label.setAttribute('for', checkboxes[i].id);
+
+    // Span-Elemente für das Label erstellen
+    const spanInner = document.createElement('span');
+    spanInner.className = 'onoffswitch-inner';
+
+    const spanSwitch = document.createElement('span');
+    spanSwitch.className = 'onoffswitch-switch';
+
+    // Span-Elemente zum Label hinzufügen
+    label.appendChild(spanInner);
+    label.appendChild(spanSwitch);
+
+    // Label zum Div-Element hinzufügen
+    div.appendChild(label);
+    
+    // Neues Div-Element anstelle der ursprünglichen Checkbox einfügen
+    parent.replaceChild(div, checkboxes[i]);
+
+  }
+}

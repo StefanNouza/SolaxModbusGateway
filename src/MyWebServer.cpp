@@ -117,6 +117,7 @@ void MyWebServer::handleWiFiReset(AsyncWebServerRequest *request) {
 }
 
 void MyWebServer::handleGetItemJson(AsyncWebServerRequest *request) {
+  /*
   AsyncResponseStream *response = request->beginResponseStream("application/json");
   response->addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   response->addHeader("Pragma", "no-cache");
@@ -125,6 +126,13 @@ void MyWebServer::handleGetItemJson(AsyncWebServerRequest *request) {
   mb->GetLiveDataAsJson(response, "");
 
   request->send(response);
+  */
+
+  mb->GetLiveDataAsJson(request);
+  
+  
+
+
 }
 
 void MyWebServer::handleGetRegisterJson(AsyncWebServerRequest *request) {
@@ -146,18 +154,12 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
   String action, subaction, item, newState; 
   String json = "{}";
 
-  AsyncResponseStream *response = request->beginResponseStream("text/json");
-  response->addHeader("Server","ESP Async Web Server");
-
   if(request->hasArg("json")) {
     json = request->arg("json");
   }
 
   JsonDocument jsonGet; // TODO Use computed size??
   DeserializationError error = deserializeJson(jsonGet, json.c_str());
-
-  JsonDocument jsonReturn;
-  jsonReturn["response"].to<JsonObject>();
 
   if (Config->GetDebugLevel() >=4) { dbg.print("Ajax Json Empfangen: "); }
   if (!error) {
@@ -173,6 +175,17 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
     RaiseError = true; 
   }
 
+  if (action && action == "RefreshLiveData") {
+    mb->GetLiveDataAsJson(request);
+    return;
+  }
+
+  AsyncResponseStream *response = request->beginResponseStream("text/json");
+  response->addHeader("Server","ESP Async Web Server");
+
+  JsonDocument jsonReturn;
+  jsonReturn["response"].to<JsonObject>();
+  
   if (RaiseError) {
     jsonReturn["response"]["status"] = 0;
     jsonReturn["response"]["text"] = buffer;
@@ -212,8 +225,9 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
     serializeJson(jsonReturn, ret);
     response->print(ret);
   
-  } else if (action && action == "RefreshLiveData") {
-      mb->GetLiveDataAsJson(response, subaction);
+  //} else if (action && action == "RefreshLiveData") {
+      //TODO
+      //mb->GetLiveDataAsJson(response, subaction);
   
   } else if (action && action == "SetActiveStatus") {
       if (strcmp(newState.c_str(),"true")==0)  mb->SetItemActiveStatus(item, true); 

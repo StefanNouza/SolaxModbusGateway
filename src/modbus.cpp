@@ -944,58 +944,99 @@ String modbus::GetInverterSN() {
  * Return all LiveData as jsonArray
  * {data: [{"name": "xx", "value": "xx", ...}, ...] }
 *******************************************************/
-void modbus::GetLiveDataAsJson(AsyncResponseStream *response, String subaction) {
-  int count = 0;
-  response->print("{\"data\": {\"items\": ["); 
+void modbus::GetLiveDataAsJson(AsyncWebServerRequest *request) {
+  std::shared_ptr<uint16_t> counter = std::make_shared<uint16_t>(0);
+  String subaction(""), json("{}");
   
-  for (uint16_t i=0; i < this->InverterLiveData->size(); i++) {
-    if (subaction == "onlyactive" && !this->InverterLiveData->at(i).active)  continue;
-    JsonDocument doc;
-    String s = "";
-    
-    doc["name"]       = this->InverterLiveData->at(i).Name.c_str();
-    doc["realname"]   = this->InverterLiveData->at(i).RealName.c_str();
-    doc["value"]      = std::move(this->InverterLiveData->at(i).value + " " + this->InverterLiveData->at(i).unit);
-    doc["active"]["checked"] = (this->InverterLiveData->at(i).active?1:0);
-    doc["active"]["name"] = this->InverterLiveData->at(i).Name.c_str();
-    doc["mqtttopic"]  = std::move(this->mqtt->getTopic(this->InverterLiveData->at(i).Name, false));
-    
-    if (this->Conf_EnableOpenWB && this->InverterLiveData->at(i).openwb.length() > 0) {
-      JsonArray wb = doc["openwb"].to<JsonArray>();
-      wb[0]["openwbtopic"]  = std::move(OpenWB->getOpenWbTopic(this->InverterLiveData->at(i).openwb));
-    }
-    
-    serializeJson(doc, s);
-    if(count>0) response->print(", ");
-    response->print(s);
-    count++;
+  if(request->hasArg("json")) {
+    json = request->arg("json");
   }
-  yield();
-  //Lazgar
-  for (uint16_t i=0; i < this->InverterIdData->size(); i++) {
-    if (subaction == "onlyactive" && !this->InverterIdData->at(i).active)  continue;
-    JsonDocument doc;
-    String s = "";
-    doc["name"] = this->InverterIdData->at(i).Name.c_str();
-    doc["realname"] = this->InverterIdData->at(i).RealName.c_str();
-    doc["value"] = std::move(this->InverterIdData->at(i).value + " " + this->InverterIdData->at(i).unit);
-    doc["active"]["checked"] = (this->InverterIdData->at(i).active?1:0);
-    doc["active"]["name"] = this->InverterIdData->at(i).Name.c_str();
-    doc["mqtttopic"] = std::move(this->mqtt->getTopic(this->InverterIdData->at(i).Name, false));
-    //Wird für die ID Daten nicht benötigt gibt keine Infos für die OpenWallbox
-    //if (this->InverterIdData->at(i).openwb.length() > 0) {
-    //  JsonArray wb = doc["openwb"].to<JsonArray>();
-    //  wb[0]["openwbtopic"]  = this->InverterIdData->at(i).openwb.c_str();
-    //}
+  JsonDocument jsonGet; 
+  DeserializationError error = deserializeJson(jsonGet, json.c_str());
+  
+  Config->log(4, "[GetLiveDataAsJson] Json command empfangen: ");
+  if (!error) {
+    if (Config->GetDebugLevel() >=4) { serializeJsonPretty(jsonGet, dbg); dbg.println(); }
 
-    serializeJson(doc, s);
-    if(count>0) response->print(", ");
-    response->print(s);
-    count++;
+    if (jsonGet["subaction"]){subaction = jsonGet["subaction"].as<String>();}
+  
+  } else { 
+    Config->log(2, "[GetLiveDataAsJson] Json Command not parseable: %s -> %s", json.c_str(), error.c_str());
   }
-  //Lazgar
-  response->printf(" ]}, \"object_id\": \"%s/%s\"}", Config->GetMqttBasePath().c_str(), Config->GetMqttRoot().c_str());
+
+	AsyncWebServerResponse *response = request->beginChunkedResponse("application/json", [this, counter, subaction](uint8_t *buffer, size_t maxLen, size_t index) {
+			String ret("");
+      ret.reserve(maxLen);
+      maxLen -= 500; // use a puffer of 500 bytes, every item is assumed to be 200 bytes
+      if (*counter == 0) {
+        // send start of JSON
+        ret += "{\"data\": {\"items\": [";
+        (*counter)++;
+      }
+      
+      if (*counter <= this->InverterIdData->size() && ret.length() < maxLen) {
+        // send IdData
+        uint16_t i = *counter - 1;
+
+        // jedes JsonObject wird mit 200 bytes angenommen, + 100 bytes puffer am Ende
+        while (i < this->InverterIdData->size() && ret.length() < maxLen) {
+          if (!(subaction == "onlyactive" && !this->InverterIdData->at(i).active)) {
+            if(*counter > 1) ret += ",";
+            ret += "{\"name\": \"" + this->InverterIdData->at(i).Name + "\",";
+            ret += "\"realname\": \"" + this->InverterIdData->at(i).RealName + "\",";
+            ret += "\"value\": \"" + this->InverterIdData->at(i).value + " " + this->InverterIdData->at(i).unit + "\",";
+            ret += "\"active\": {\"checked\": " + String(this->InverterIdData->at(i).active ? 1 : 0) + ", \"name\": \"" + this->InverterIdData->at(i).Name + "\"},";
+            ret += "\"mqtttopic\": \"" + this->mqtt->getTopic(this->InverterIdData->at(i).Name, false) + "\"";
+            
+            if (this->Conf_EnableOpenWB && this->InverterIdData->at(i).openwb.length() > 0) {
+              ret += ",\"openwb\": [{\"openwbtopic\": \"" + OpenWB->getOpenWbTopic(this->InverterIdData->at(i).openwb) + "\"}]";
+            }
+            ret += "}";
+          }
+
+          (*counter)++;
+          i++;
+        }
+      } 
+      
+      if (*counter <= this->InverterIdData->size() + this->InverterLiveData->size() && ret.length() < maxLen) {
+        // send LiveData
+        uint16_t i = *counter - this->InverterIdData->size() - 1;
+        
+        while (i < this->InverterLiveData->size() && ret.length() < maxLen) {
+          if (!(subaction == "onlyactive" && !this->InverterLiveData->at(i).active)) {
+            if(*counter > 1) ret += ",";
+            ret += "{\"name\": \"" + this->InverterLiveData->at(i).Name + "\",";
+            ret += "\"realname\": \"" + this->InverterLiveData->at(i).RealName + "\",";
+            ret += "\"value\": \"" + this->InverterLiveData->at(i).value + " " + this->InverterLiveData->at(i).unit + "\",";
+            ret += "\"active\": {\"checked\": " + String(this->InverterLiveData->at(i).active ? 1 : 0) + ", \"name\": \"" + this->InverterLiveData->at(i).Name + "\"},";
+            ret += "\"mqtttopic\": \"" + this->mqtt->getTopic(this->InverterLiveData->at(i).Name, false) + "\"";
+            
+            if (this->Conf_EnableOpenWB && this->InverterLiveData->at(i).openwb.length() > 0) {
+              ret += ",\"openwb\": [{\"openwbtopic\": \"" + OpenWB->getOpenWbTopic(this->InverterLiveData->at(i).openwb) + "\"}]";
+            }
+            ret += "}";
+          } 
+
+          (*counter)++;
+          i++;
+        }
+
+      }
+      
+      if (this->InverterIdData->size() + this->InverterLiveData->size() + 1 == *counter) {
+        // send end of JSON
+        ret += " ]}, \"object_id\": \"" + Config->GetMqttBasePath() + "/" + Config->GetMqttRoot() + "\"}";
+        (*counter)++;
+      }
+      int len = sprintf((char*)buffer, ret.c_str());
+      return len;
+
+	});
+
+	request->send(response);
 }
+
 
 /*******************************************************
  * Return all LiveData as jsonArray
@@ -1004,13 +1045,15 @@ void modbus::GetLiveDataAsJson(AsyncResponseStream *response, String subaction) 
 *******************************************************/
 void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
   int count = 0;
-  response->print("{\"data\": ["); 
   
   File regfile = LittleFS.open("/regs/"+this->InverterType.filename);
   if (!regfile) {
     Config->log(1, "failed to open %s file", this->InverterType.filename.c_str());
     return;
   }
+
+  response->print("{\"data\": ["); 
+  
   String streamString = "";
   streamString = "\""+ this->InverterType.name +"\": {";
   regfile.find(streamString.c_str());
@@ -1024,14 +1067,10 @@ void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
       
     if (!error) {
       // Print the result
-      if (Config->GetDebugLevel() >=4) {dbg.println("parsing JSON ok"); }
+      Config->log(4, "parsing JSON ok"); 
       if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
     } else {
-      if (Config->GetDebugLevel() >=1) {
-        dbg.print("(Function GetRegisterAsJson) Failed to parse JSON Register Data: "); 
-        dbg.print(error.c_str()); 
-        dbg.println();
-      }
+      Config->log(4, "(Function GetRegisterAsJson) Failed to parse JSON Register Data: %s", error.c_str()); 
     }
   
     String s = "";
@@ -1055,14 +1094,10 @@ void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
 
     if (!error) {
       // Print the result
-      if (Config->GetDebugLevel() >=4) {dbg.println("parsing JSON ok"); }
+      Config->log(4, "parsing JSON ok"); 
       if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
     } else {
-      if (Config->GetDebugLevel() >=1) {
-        dbg.print("(Function GetRegisterAsJson) Failed to parse JSON Register Data: "); 
-        dbg.print(error.c_str()); 
-        dbg.println();
-      }
+      Config->log(1, "(Function GetRegisterAsJson) Failed to parse JSON Register Data: %s", error.c_str()); 
     }
 
     String s = "";
@@ -1153,7 +1188,7 @@ void modbus::LoadRegItems(std::vector<reg_t>* vector, String type) {
       
     if (!error) {
       // Print the result
-      if (Config->GetDebugLevel() >=4) {dbg.println("parsing JSON ok"); }
+      Config->log(4, "parsing JSON ok");
       if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
     } else {
       Config->log(1, "(Function LoadRegItems) Failed to parse JSON Register Data for Inverter <%s> and type <%s>: %s", this->InverterType.name.c_str(), type.c_str(), error.c_str());
@@ -1232,11 +1267,11 @@ void modbus::LoadJsonConfig(bool firstrun) {
         if (doc["data"]["openwbmodulid"])    { this->Conf_OpenWBModulID = doc["data"]["openwbmodulid"].as<uint8_t>(); this->OpenWB->addMapping("InverterID", String(this->Conf_OpenWBModulID)); }
         if (doc["data"]["openwbbatteryid"])  { this->Conf_OpenWBBatteryID = doc["data"]["openwbbatteryid"].as<uint8_t>(); this->OpenWB->addMapping("BatteryID", String(this->Conf_OpenWBBatteryID)); }
 
-        this->Conf_EnableOpenWB       = (bool)doc["data"]["EnableOpenWb"].as<int>();
+        this->Conf_EnableOpenWB       = doc["data"]["enableOpenWb"].as<bool>();
         this->Conf_EnableSetters      = doc["data"]["enable_setters"].as<bool>();
         this->enableCrcCheck          = doc["data"]["enableCrcCheck"].as<bool>();
         this->enableLengthCheck       = doc["data"]["enableLengthCheck"].as<bool>();
-        this->enableRelays            = (bool)(doc["data"]["EnableRelays"]).as<int>();
+        this->enableRelays            = doc["data"]["enableRelays"].as<bool>();
         
         if (doc["data"]["invertertype"])     { 
           bool found = false;
@@ -1386,11 +1421,9 @@ void modbus::GetInitData(AsyncResponseStream *response) {
   json["data"]["txintervalid"]        = this->TxIntervalIdData;
   json["data"]["GpioPin_Relay1"]      = this->pin_Relay1;
   json["data"]["GpioPin_Relay2"]      = this->pin_Relay2;
-  json["data"]["EnableRelays_On"]     = ((this->enableRelays)?1:0);
-  json["data"]["EnableRelays_Off"]    = ((this->enableRelays)?0:1);
+  json["data"]["enableRelays"]        = ((this->enableRelays)?1:0);
 
-  json["data"]["EnableOpenWb_On"]     = ((this->Conf_EnableOpenWB)?1:0);
-  json["data"]["EnableOpenWb_Off"]    = ((this->Conf_EnableOpenWB)?0:1);
+  json["data"]["enableOpenWb"]        = ((this->Conf_EnableOpenWB)?1:0);
   json["data"]["openwbmodulid"]       = this->Conf_OpenWBModulID;
   json["data"]["openwbbatteryid"]     = this->Conf_OpenWBBatteryID;
 

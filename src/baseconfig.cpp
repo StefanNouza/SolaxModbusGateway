@@ -1,6 +1,10 @@
 #include "baseconfig.h"
 
-BaseConfig::BaseConfig() : debuglevel(2), serial_rx(3), serial_tx(1), useAuth(false) {  
+BaseConfig::BaseConfig(): debuglevel(2), 
+                          serial_rx(3), 
+                          serial_tx(1),
+                          mqtt_UseRandomClientID(true),
+                          useAuth(false) {  
   #ifdef ESP8266
     LittleFS.begin();
   #elif defined(ESP32)
@@ -41,15 +45,17 @@ void BaseConfig::LoadJsonConfig() {
         if (doc["data"]["mqttuser"])         { this->mqtt_username = doc["data"]["mqttuser"].as<String>();} else {this->mqtt_username = "";}
         if (doc["data"]["mqttpass"])         { this->mqtt_password = doc["data"]["mqttpass"].as<String>();} else {this->mqtt_password = "";}
         if (doc["data"]["mqttbasepath"])     { this->mqtt_basepath = doc["data"]["mqttbasepath"].as<String>();} else {this->mqtt_basepath = "home/";}
-        if (doc["data"]["UseRandomClientID"]){ if (strcmp(doc["data"]["UseRandomClientID"], "none")==0) { this->mqtt_UseRandomClientID=false;} else {this->mqtt_UseRandomClientID=true;}} else {this->mqtt_UseRandomClientID = true;}
         if (doc["data"]["SelectConnectivity"]){if (strcmp(doc["data"]["SelectConnectivity"], "wifi")==0) { this->useETH=false;} else {this->useETH=true;}} else {this->useETH = false;}
         if (doc["data"]["debuglevel"])       { this->debuglevel = _max(doc["data"]["debuglevel"].as<uint8_t>(), 0);} else {this->debuglevel = 0; }
         if (doc["data"]["SelectLAN"])        { this->LANBoard = doc["data"]["SelectLAN"].as<String>();} else {this->LANBoard = "";}
         if (doc["data"]["serial_rx"])        { this->serial_rx = doc["data"]["serial_rx"].as<uint8_t>(); } else {this->serial_rx = 3;}
         if (doc["data"]["serial_tx"])        { this->serial_tx = doc["data"]["serial_tx"].as<uint8_t>(); } else {this->serial_tx = 1;}
-        if (doc["data"]["sel_auth"])         { if (strcmp(doc["data"]["sel_auth"], "off")==0) { this->useAuth=false;} else {this->useAuth=true;}} else {this->useAuth = false;}
         if (doc["data"]["auth_user"])        { this->auth_user = doc["data"]["auth_user"].as<String>();} else {this->auth_user = "admin";}
         if (doc["data"]["auth_pass"])        { this->auth_pass = doc["data"]["auth_pass"].as<String>();} else {this->auth_pass = "password";}
+      
+        this->useAuth                     = doc["data"]["sel_auth"].as<bool>();
+        this->mqtt_UseRandomClientID      = doc["data"]["useRandomClientID"].as<bool>();
+      
       } else {
         this->log(1, "failed to load json config, load default config");
         loadDefaultConfig = true;
@@ -98,10 +104,8 @@ void BaseConfig::GetInitData(AsyncResponseStream *response) {
   json["data"]["debuglevel"]  = this->debuglevel;
   json["data"]["sel_wifi"]    = ((this->useETH)?0:1);
   json["data"]["sel_eth"]     = ((this->useETH)?1:0);
-  json["data"]["sel_URCID1"]  = ((this->mqtt_UseRandomClientID)?0:1);
-  json["data"]["sel_URCID2"]  = ((this->mqtt_UseRandomClientID)?1:0);
-  json["data"]["sel_auth_off"]= ((this->useAuth)?0:1);
-  json["data"]["sel_auth_on"] = ((this->useAuth)?1:0);
+  json["data"]["useRandomClientID"]  = ((this->mqtt_UseRandomClientID)?1:0);
+  json["data"]["sel_auth"]= ((this->useAuth)?1:0);
   json["data"]["auth_user"]   = this->auth_user;
   json["data"]["auth_pass"]   = this->auth_pass;
 
