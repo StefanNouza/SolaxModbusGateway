@@ -548,7 +548,7 @@ int modbus::JsonPosArrayToInt(JsonArray posArray, JsonArray posArray2) {
       if (v < this->DataFrame->size()) { 
         val_i = (val_i << 8) | this->DataFrame->at(v); 
         val_max = (val_max << 8) | 0xFF;
-      }
+      } else Config->log(1, "Error: position %d out of dataframe range", v);
     }
   }
 
@@ -557,7 +557,7 @@ int modbus::JsonPosArrayToInt(JsonArray posArray, JsonArray posArray2) {
     for(uint16_t w : posArray2) {
       if (w < this->DataFrame->size()) { 
         val2_i = (val2_i << 8) | this->DataFrame->at(w); 
-      }
+      } else Config->log(1, "Error: position %d out of dataframe range", w);
     }
   }
 
@@ -728,20 +728,20 @@ void modbus::ParseData() {
         posArray2 = elem["position2"].as<JsonArray>();
       } 
 
-      // check if item is active to send data out via mqtt
+      // check if LiveData item is active to send data out via mqtt
       for (uint16_t i=0; i < this->InverterLiveData->size(); i++) {
         if (this->InverterLiveData->at(i).Name == d.Name && this->InverterLiveData->at(i).active) {
           IsActiveItem = true;
         }
       }
-      //Lazgar
-      // check if item is active to send data out via mqtt
+      
+      // check if ID-Data item is active to send data out via mqtt
       for (uint16_t i=0; i < this->InverterIdData->size(); i++) {
         if (this->InverterIdData->at(i).Name == d.Name && this->InverterIdData->at(i).active) {
          IsActiveItem = true;
         }
       }
-      //Lazgar
+      
       // ************* processing data ******************
       if (datatype == "float") {
         //********** handle Datatype FLOAT ***********//
@@ -761,8 +761,10 @@ void modbus::ParseData() {
           char buffer[posArray.size()+1];
           uint8_t i=0;
           for(int v : posArray) {
-            buffer[i] = static_cast<char>(DataFrame->at(v));
-            i++;
+            if (v < DataFrame->size()) {
+              buffer[i] = static_cast<char>(DataFrame->at(v));
+              i++;
+            } else Config->log(1, "Error: for item '%s' position %d out of dataframe range", d.Name.c_str(), v);
           }
           buffer[i] = '\0';
           d.value = String(buffer);
