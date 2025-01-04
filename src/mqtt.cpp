@@ -1,8 +1,6 @@
 #include "mqtt.h"
 
-MQTT::MQTT(AsyncWebServer* server, DNSServer *dns, const char* MqttServer, uint16_t MqttPort, String MqttBasepath, String MqttRoot, char* APName, char* APpassword): 
-  server(server), 
-  dns(dns), 
+MQTT::MQTT(const char* MqttServer, uint16_t MqttPort, String MqttBasepath, String MqttRoot, char* APName, char* APpassword): 
   improvSerial(&Serial),
   mqtt_root(MqttRoot), 
   mqtt_basepath(MqttBasepath), 
