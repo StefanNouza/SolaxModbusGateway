@@ -99,7 +99,7 @@
                     "realname": "Reactive Power Generation of Today",
                     "datatype": "float",
                     "factor": 0.1,
-                    "unit": "kVarh"
+                    "unit": "kWh"
                 },
                 {
                     "position": [
