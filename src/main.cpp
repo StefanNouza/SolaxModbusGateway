@@ -57,8 +57,7 @@ void setup() {
   Config->log(1, "Starting BaseConfig");
   
   Config->log(1, "Starting Wifi and MQTT");
-  mqtt = new MQTT(&server, &dns, 
-                    Config->GetMqttServer().c_str(), 
+  mqtt = new MQTT(Config->GetMqttServer().c_str(), 
                     Config->GetMqttPort(), 
                     Config->GetMqttBasePath().c_str(), 
                     Config->GetMqttRoot().c_str(),
@@ -69,7 +68,7 @@ void setup() {
 
   mb = new modbus();
   mb->enableMqtt(mqtt);
-
+  
   Config->log(1, "attempting to start WebServer");
   mywebserver = new MyWebServer(&server, &dns);
 }
