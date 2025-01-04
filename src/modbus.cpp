@@ -97,7 +97,7 @@ String modbus::GetMqttSetTopic(String command) {
   char s[100] = {0}; 
   memset(s, 0, sizeof(s));
 
-  snprintf(s, sizeof(dbg), "%s/%s/set/%s", Config->GetMqttBasePath().c_str(), Config->GetMqttRoot().c_str(), command.c_str());
+  snprintf(s, sizeof(s), "%s/%s/set/%s", Config->GetMqttBasePath().c_str(), Config->GetMqttRoot().c_str(), command.c_str());
   return (String)s;
 }
 
@@ -121,7 +121,7 @@ void modbus::GenerateMqttSubscriptions() {
     if (!error) {
       // Print the result
       Config->log(4, "parsing JSON for <set> data ok");
-      if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
+      Config->log(5, elem);
      
       if(!elem["name"].isNull() && elem["request"].is<JsonArray>()) {
         subscription_t s = {};
@@ -243,11 +243,8 @@ void modbus::LoadInverterConfigFromJson() {
   if (error) {
     Config->log(1, "Error: unable to read configdata for inverter %s: %s", this->InverterType.name.c_str(), error.c_str());
   } else {
-    if (Config->GetDebugLevel() >=4) {
-      Config->log(4, "Read config data for inverter %s", this->InverterType.name.c_str());
-      serializeJsonPretty(doc, dbg);
-      dbg.println();
-    }
+    Config->log(4, "Read config data for inverter %s", this->InverterType.name.c_str());
+    Config->log(4, doc);
   }
 
   //this->Conf_LiveDataFunctionCode   = this->String2Byte(doc[this->InverterType.name]["config"]["LiveDataFunctionCode"].as<String>());
@@ -662,7 +659,7 @@ void modbus::ParseData() {
       if (!error) {
         // Print the result
         Config->log(4, "parsing JSON ok");
-        if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
+        Config->log(5, elem);
       } else {
         Config->log(1, "(Function ParseData) Failed to parse JSON Register Data: %s", error.c_str()); 
       }
@@ -956,7 +953,7 @@ void modbus::GetLiveDataAsJson(AsyncWebServerRequest *request) {
   
   Config->log(4, "[GetLiveDataAsJson] Json command empfangen: ");
   if (!error) {
-    if (Config->GetDebugLevel() >=4) { serializeJsonPretty(jsonGet, dbg); dbg.println(); }
+    Config->log(4, jsonGet);
 
     if (jsonGet["subaction"]){subaction = jsonGet["subaction"].as<String>();}
   
@@ -1068,7 +1065,7 @@ void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
     if (!error) {
       // Print the result
       Config->log(4, "parsing JSON ok"); 
-      if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
+      Config->log(5, elem);
     } else {
       Config->log(4, "(Function GetRegisterAsJson) Failed to parse JSON Register Data: %s", error.c_str()); 
     }
@@ -1095,7 +1092,7 @@ void modbus::GetRegisterAsJson(AsyncResponseStream *response) {
     if (!error) {
       // Print the result
       Config->log(4, "parsing JSON ok"); 
-      if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
+      Config->log(5, elem);
     } else {
       Config->log(1, "(Function GetRegisterAsJson) Failed to parse JSON Register Data: %s", error.c_str()); 
     }
@@ -1189,7 +1186,7 @@ void modbus::LoadRegItems(std::vector<reg_t>* vector, String type) {
     if (!error) {
       // Print the result
       Config->log(4, "parsing JSON ok");
-      if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
+      Config->log(5, elem);
     } else {
       Config->log(1, "(Function LoadRegItems) Failed to parse JSON Register Data for Inverter <%s> and type <%s>: %s", this->InverterType.name.c_str(), type.c_str(), error.c_str());
     }
@@ -1251,7 +1248,7 @@ void modbus::LoadJsonConfig(bool firstrun) {
       DeserializationError error = deserializeJson(doc, configFile);
       
       if (!error && doc["data"]) {
-        if (Config->GetDebugLevel() >=3) { serializeJsonPretty(doc, dbg); dbg.println(); }
+        Config->log(3, doc);
         OpenWB->clearMappings();
 
         if (doc["data"]["pin_rx"])           { this->pin_RX = (int)(doc["data"]["pin_rx"]);} else {this->pin_RX = this->default_pin_RX;}
@@ -1366,7 +1363,7 @@ void modbus::LoadJsonItemConfig() {
         if (!error) {
           // Print the result
           Config->log(4, "parsing JSON ok"); 
-          if (Config->GetDebugLevel() >=5) {serializeJsonPretty(elem, dbg);}
+          Config->log(5, elem);
         } else {
           Config->log(1, "(Function LoadJsonItemConfig) Failed to parse JSON Register Data: %s", error.c_str()); 
         }
