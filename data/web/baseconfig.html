@@ -73,15 +73,11 @@
           </tr>
 
           <tr>
-            <td colspan='2'>
-              <div class='inline'>
-                <input type='radio' id='sel_URCID1' name='UseRandomClientID' value='none'/>
-                <label for='sel_URCID1'>use static MQTT ClientID</label>
-              </div>
-              <div class='inline'>
-                <input type='radio' id='sel_URCID2' name='UseRandomClientID' value='yes'/>
-                <label for='sel_URCID2'>use dynamic MQTT ClientID</label>
-              </div>
+            <td>
+              use dynamic MQTT ClientID
+            </td>
+            <td>
+              <input type='checkbox' name='useRandomClientID' id='useRandomClientID' />
             </td>
           </tr>
 
@@ -96,16 +92,11 @@
           </tr>
 
           <tr>
-            <td colspan='2'>
-            <div class='inline'>
-              <input type='radio' id='sel_auth_on' name='sel_auth' value='on' onclick="radioselection(['tr_auth_user','tr_auth_pass'],[])"/>
-              <label for='sel_auth_on'>use Authentification for WebUI</label>
-            </div>
-            
-            <div class='inline'>
-              <input type='radio' id='sel_auth_off' name='sel_auth' value='off' onclick="radioselection([],['tr_auth_user','tr_auth_pass'])"/>
-              <label for='sel_auth_off'>no Authentification for WebUI</label>
-            </div>  
+            <td>
+              use Authentification for WebUI
+            </td>
+            <td>
+              <input type='checkbox' name='sel_auth' id='sel_auth' onclick="onCheckboxSelection(this, ['tr_auth_user','tr_auth_pass'],[])"/>
             </td>
           </tr>
 

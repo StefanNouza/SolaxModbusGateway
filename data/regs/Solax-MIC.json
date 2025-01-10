@@ -183,7 +183,6 @@
           "position": [43, 44],
           "name": "PowerPv1",
           "realname": "Erzeugungsleistung Pv1",
-          "openwbtopic": "openWB/set/pv/1/W",
           "datatype": "float",
           "unit": "W"
         },
@@ -191,7 +190,6 @@
           "position": [45, 46],
           "name": "PowerPv2",
           "realname": "Erzeugungsleistung Pv2",
-          "openwbtopic": "openWB/set/pv/2/W",
           "datatype": "float",
           "unit": "W"
         },
@@ -199,7 +197,7 @@
           "position": [75, 76, 73, 74],
           "name": "EnergyTotalToGridWh",
           "realname": "Total Energy to Grid in Wh",
-          "openwbtopic": "openWB/set/pv/WhCounter",
+          "openwbtopic": "setcounterwh",
           "datatype": "integer", 
           "factor": 100,
           "unit": "Wh"
@@ -224,7 +222,7 @@
           "position": [121, 122, 119, 120],
           "name": "GridPower",
           "realname": "Grid Power",
-          "openwbtopic": "openWB/set/pv/W",
+          "openwbtopic": "setpvw",
           "datatype": "integer",
           "unit": "W"
         },

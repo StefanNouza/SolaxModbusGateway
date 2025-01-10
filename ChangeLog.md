@@ -1,3 +1,9 @@
+Release 3.3.1:
+  - new Feature: datatype "binary" now available for json register definitions (PR #115)
+  - BugFix: fix null-terminationof string handling (#96)
+  - new feature: support for OpenWB 2.0 Api (#100)
+  - bugfix: fix esp crash for /getitems if using an huge register table (#76)
+
 Release 3.3.0:
   - new feature: WebSerial as remote serial output (#74)
   - new feature: configurable serial output pins
@@ -11,6 +17,13 @@ Release 3.3.0:
   - new feature: replace customOTA to custom ElegantOTA
   - move config files from root to subfolder /config
   - new feature: Backup/Restore of configfiles for OTA
+
+  **Breaking changes** 
+  From release 0.7 onwards, an access point will no longer be opened during an initial installation. The WiFi access data must be entered via the web installer. This is used for both initial installation and entry of WiFi access data. 
+  When updating version 0.6 to 0.7, a new installation must also be carried out because the WiFi handling has been switched to the ImprovWiFi Library. 
+  If version 0.7 is already installed on the ESP device, an OTA update is sufficient. See “Update” button at ESP-webinterface 
+
+  Detailed instructions can be found in the [WiKi](https://github.com/tobiasfaust/SolaxModbusGateway/wiki)
 
 Release 3.2.2:
   - new feature: GoodWe Support, by @TigerGrey (#58)

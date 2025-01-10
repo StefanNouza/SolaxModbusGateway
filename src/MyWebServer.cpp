@@ -39,17 +39,16 @@ MyWebServer::MyWebServer(AsyncWebServer *server, DNSServer* dns): DoReboot(false
   // try to start the server if wifi is connected, otherwise wait for wifi connection
   if (mqtt->GetConnectStatusWifi()) {
     server->begin();
-    dbg.println(F("WebServer has been started ..."));
+    Config->log(1, "WebServer has been started ...");
   } else {
     mqtt->improvSerial.onImprovConnected(std::bind(&MyWebServer::onImprovWiFiConnectedCb, this, std::placeholders::_1, std::placeholders::_2));
   }
 }
 
 
-void MyWebServer::onImprovWiFiConnectedCb(const char *ssid, const char *password)
-{
+void MyWebServer::onImprovWiFiConnectedCb(const char *ssid, const char *password) {
   server->begin();
-  dbg.println(F("WebServer has been started now ..."));
+  Config->log(1, "WebServer has been started now ...");
 }
 
 void MyWebServer::loop() {
@@ -57,10 +56,10 @@ void MyWebServer::loop() {
   if (this->DoReboot) {
     if (this->RequestRebootTime == 0) {
       this->RequestRebootTime = millis();
-      dbg.println("Request to Reboot, wait 5sek ...");
+      Config->log(1, "Request to Reboot, wait 5sek ...");
     }
     if (millis() - this->RequestRebootTime > 5000) { // wait 3sek until reboot
-      dbg.println("Rebooting...");
+      Config->log(1, "Rebooting...");
       ESP.restart();
     }
   }
@@ -87,18 +86,16 @@ void MyWebServer::handleReboot(AsyncWebServerRequest *request) {
 }
 
 void MyWebServer::handleReset(AsyncWebServerRequest *request) {
-  if (Config->GetDebugLevel() >= 3) { dbg.println("deletion of all config files was requested ...."); }
+  Config->log(3, "deletion of all config files was requested ....");
   //LittleFS.format(); // Werkszustand -> nur die config dateien loeschen, die register dateien muessen erhalten bleiben
-  File root = LittleFS.open("/");
+  File root = LittleFS.open("/config/");
   File file = root.openNextFile();
   while(file){
-    String path("/"); path.concat(file.name());
-    if (path.indexOf(".json") == -1) {dbg.println("Continue"); file = root.openNextFile(); continue;}
+    String path("/config/"); path.concat(file.name());
+    if (path.indexOf(".json") == -1) {file = root.openNextFile(); continue;}
     file.close();
     bool f = LittleFS.remove(path);
-    if (Config->GetDebugLevel() >= 3) {
-      dbg.printf("deletion of configuration file '%s' %s\n", file.name(), (f?"was successful":"has failed"));;
-    }
+    Config->log(3, "deletion of configuration file '%s' %s", file.name(), (f?"was successful":"has failed"));
     file = root.openNextFile();
   }
   root.close();
@@ -109,7 +106,7 @@ void MyWebServer::handleReset(AsyncWebServerRequest *request) {
 void MyWebServer::handleWiFiReset(AsyncWebServerRequest *request) {
   #ifdef ESP32
     WiFi.disconnect(true,true);
-  #elif ESP8266  
+  #elif defined(ESP8266)  
     ESP.eraseConfig();
   #endif
   
@@ -117,14 +114,7 @@ void MyWebServer::handleWiFiReset(AsyncWebServerRequest *request) {
 }
 
 void MyWebServer::handleGetItemJson(AsyncWebServerRequest *request) {
-  AsyncResponseStream *response = request->beginResponseStream("application/json");
-  response->addHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-  response->addHeader("Pragma", "no-cache");
-  response->addHeader("Expires", "-1");
-  
-  mb->GetLiveDataAsJson(response, "");
-
-  request->send(response);
+  mb->GetLiveDataAsJson(request);
 }
 
 void MyWebServer::handleGetRegisterJson(AsyncWebServerRequest *request) {
@@ -146,9 +136,6 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
   String action, subaction, item, newState; 
   String json = "{}";
 
-  AsyncResponseStream *response = request->beginResponseStream("text/json");
-  response->addHeader("Server","ESP Async Web Server");
-
   if(request->hasArg("json")) {
     json = request->arg("json");
   }
@@ -156,12 +143,9 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
   JsonDocument jsonGet; // TODO Use computed size??
   DeserializationError error = deserializeJson(jsonGet, json.c_str());
 
-  JsonDocument jsonReturn;
-  jsonReturn["response"].to<JsonObject>();
-
-  if (Config->GetDebugLevel() >=4) { dbg.print("Ajax Json Empfangen: "); }
+  Config->log(4, "Ajax Json Empfangen: ");
   if (!error) {
-    if (Config->GetDebugLevel() >=4) { serializeJsonPretty(jsonGet, dbg); dbg.println(); }
+    Config->log(4, jsonGet);
 
     if (jsonGet["action"])   {action    = jsonGet["action"].as<String>();}
     if (jsonGet["subaction"]){subaction = jsonGet["subaction"].as<String>();}
@@ -173,15 +157,24 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
     RaiseError = true; 
   }
 
+  if (action && action == "RefreshLiveData") {
+    mb->GetLiveDataAsJson(request);
+    return;
+  }
+
+  AsyncResponseStream *response = request->beginResponseStream("text/json");
+  response->addHeader("Server","ESP Async Web Server");
+
+  JsonDocument jsonReturn;
+  jsonReturn["response"].to<JsonObject>();
+  
   if (RaiseError) {
     jsonReturn["response"]["status"] = 0;
     jsonReturn["response"]["text"] = buffer;
     serializeJson(jsonReturn, ret);
     response->print(ret);
 
-    if (Config->GetDebugLevel() >=2) {
-      dbg.println(FPSTR(buffer));
-    }
+    Config->log(4, buffer);
 
     return;
 
@@ -212,8 +205,9 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
     serializeJson(jsonReturn, ret);
     response->print(ret);
   
-  } else if (action && action == "RefreshLiveData") {
-      mb->GetLiveDataAsJson(response, subaction);
+  //} else if (action && action == "RefreshLiveData") {
+      //TODO
+      //mb->GetLiveDataAsJson(response, subaction);
   
   } else if (action && action == "SetActiveStatus") {
       if (strcmp(newState.c_str(),"true")==0)  mb->SetItemActiveStatus(item, true); 
@@ -234,12 +228,10 @@ void MyWebServer::handleAjax(AsyncWebServerRequest *request) {
     serializeJson(jsonReturn, ret);
     response->print(ret);
 
-    if (Config->GetDebugLevel() >=1) {
-      dbg.println(buffer);
-    }
+    Config->log(1, buffer);
   }
 
-  if (Config->GetDebugLevel() >=4) { dbg.print("Ajax Json Antwort: "); dbg.println(ret); }
+  Config->log(4, "Ajax Json Antwort: ", ret);
   
   request->send(response);
 }

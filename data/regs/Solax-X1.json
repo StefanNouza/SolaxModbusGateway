@@ -77,7 +77,7 @@
                   ],
                   "name": "GridPower",
                   "realname": "Grid Power",
-                  "openwbtopic": "openWB/set/pv/W",
+                  "openwbtopic": "setpvw",
                   "datatype": "integer",
                   "unit": "W"
               },
@@ -204,7 +204,6 @@
                   ],
                   "name": "PowerPv1",
                   "realname": "Power PV 1",
-                  "openwbtopic": "openWB/set/pv/1/W",
                   "datatype": "integer",
                   "unit": "W"
               },
@@ -215,7 +214,6 @@
                   ],
                   "name": "PowerPv2",
                   "realname": "Power PV 2",
-                  "openwbtopic": "openWB/set/pv/2/W",
                   "datatype": "integer",
                   "unit": "W"
               },
@@ -249,7 +247,7 @@
                   "name": "BatPower",
                   "realname": "Battery Power",
                   "datatype": "integer",
-                  "openwbtopic": "openWB/set/houseBattery/W",
+                  "openwbtopic": "setbatw",
                   "unit": "W"
               },
               {
@@ -270,7 +268,7 @@
                   "name": "BatCapacity",
                   "realname": "Battery Capacity",
                   "datatype": "integer",
-                  "openwbtopic": "openWB/set/houseBattery/%Soc",
+                  "openwbtopic": "setbatsoc",
                   "unit": "%"
               },
               {
@@ -282,7 +280,7 @@
                   ],
                   "name": "OutputEnergyChargeWh",
                   "realname": "Output Energy Charge (Wh)",
-                  "openwbtopic": "openWB/set/houseBattery/WhExported",
+                  "openwbtopic": "setbatexpwh",
                   "datatype": "integer",
                   "factor": 100,
                   "unit": "Wh"
@@ -320,7 +318,7 @@
                   ],
                   "name": "InputEnergyChargeWh",
                   "realname": "Input Energy Charge (Wh)",
-                  "openwbtopic": "openWB/set/houseBattery/WhImported",
+                  "openwbtopic": "setbatimpwh",
                   "datatype": "integer",
                   "factor": 100,
                   "unit": "Wh"
@@ -407,7 +405,7 @@
                   ],
                   "name": "EnergyTotalToGridWh",
                   "realname": "Total Energy to Grid in Wh",
-                  "openwbtopic": "openWB/set/pv/WhCounter",
+                  "openwbtopic": "setcounterwh",
                   "datatype": "integer",
                   "factor": 100,
                   "unit": "Wh"

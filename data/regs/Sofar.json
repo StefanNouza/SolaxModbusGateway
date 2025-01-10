@@ -69,7 +69,6 @@
           "position": [23, 24],
           "name": "PowerPv1",
           "realname": "Power PV 1",
-          "openwbtopic": "openWB/set/pv/1/W",
           "datatype": "integer",
           "factor": 10,
           "unit": "W"
@@ -78,7 +77,6 @@
           "position": [25, 26],
           "name": "PowerPv2",
           "realname": "Power PV 2",
-          "openwbtopic": "openWB/set/pv/2/W",
           "datatype": "integer",
           "factor": 10,
           "unit": "W"
@@ -87,7 +85,7 @@
           "position": [27,28],
           "name": "GridPower",
           "realname": "Grid Power",
-          "openwbtopic": "openWB/set/pv/W",
+          "openwbtopic": "setpvw",
           "datatype": "float",
           "factor": 10,
           "unit": "W"

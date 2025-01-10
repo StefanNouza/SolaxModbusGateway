@@ -17,6 +17,7 @@ function GetInitData() {
 
 // ************************************************
 function MyCallback() {
+  //transformCheckboxes()
   document.querySelector("#loader").style.visibility = "hidden";
   document.querySelector("body").style.visibility = "visible";
 }

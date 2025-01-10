@@ -14,6 +14,8 @@ function GetInitData() {
 
 // ************************************************
 function MyCallback() {
+  transformCheckboxes();
+  handleRadioSelections();
   CreateSelectionListFromInputField('input[type=number][id^=GpioPin]', [gpio]);
   document.querySelector("#loader").style.visibility = "hidden";
   document.querySelector("body").style.visibility = "visible";

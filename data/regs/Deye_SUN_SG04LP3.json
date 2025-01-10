@@ -99,7 +99,7 @@
                     "realname": "Reactive Power Generation of Today",
                     "datatype": "float",
                     "factor": 0.1,
-                    "unit": "kVarh"
+                    "unit": "kWh"
                 },
                 {
                     "position": [
@@ -323,6 +323,20 @@
                     "realname": "Total PV Power",
                     "datatype": "float",
                     "factor": 0.1,
+                    "unit": "KWh"
+                },
+                {
+                    "position": [
+                        73,
+                        74,
+                        71,
+                        72
+                    ],
+                    "name": "TotalPVPowerWh",
+                    "realname": "Total PV Power in Wh",
+                    "datatype": "float",
+                    "factor": 100,
+                    "openwbtopic": "setcounterwh",
                     "unit": "KWh"
                 },
                 {
@@ -1226,8 +1240,8 @@
                         15,
                         16
                     ],
-                    "name": "SN",
-                    "realname": "SerialNumber",
+                    "name": "InverterSN",
+                    "realname": "Inverter SerialNumber",
                     "datatype": "string"
                 }
             ]
