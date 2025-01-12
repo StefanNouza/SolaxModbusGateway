@@ -1,3 +1,6 @@
+Release 3.3.2:
+  - new feature: add confirmation dialog for ESP reset or Wifi-Reset
+  
 Release 3.3.1:
   - new Feature: datatype "binary" now available for json register definitions (PR #115)
   - BugFix: fix null-terminationof string handling (#96)
